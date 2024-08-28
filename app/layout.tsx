@@ -2,6 +2,7 @@ import "./globals.css";
 import { Inter as FontSans } from "next/font/google";
 
 import { cn } from "@/lib/utils";
+import ReactQueryProvider from "@/components/shared/ReactQueryProvider";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -22,7 +23,7 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        {children}
+        <ReactQueryProvider>{children}</ReactQueryProvider>
       </body>
     </html>
   );

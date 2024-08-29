@@ -8,9 +8,19 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useForm } from "react-hook-form";
 import Link from "next/link";
 
-const WelcomePage = () => {
+const SignUpForm = () => {
+  const {
+    register,
+    reset,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    //  resolver: zodresolver,
+  });
+
   return (
     <div className="flex h-screen flex-col items-center justify-center">
       <Card className="mx-auto max-w-sm">
@@ -21,7 +31,7 @@ const WelcomePage = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4">
+          <form className="grid gap-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="first-name">First name</Label>
@@ -51,7 +61,7 @@ const WelcomePage = () => {
             <Button variant="outline" className="w-full">
               Sign up with GitHub
             </Button>
-          </div>
+          </form>
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
             <Link href="#" className="underline">
@@ -64,4 +74,4 @@ const WelcomePage = () => {
   );
 };
 
-export default WelcomePage;
+export default SignUpForm;

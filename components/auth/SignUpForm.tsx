@@ -13,21 +13,44 @@ import { Label } from "@/components/ui/label";
 import { useForm, SubmitHandler } from "react-hook-form";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SignUpSchema, TSignUp } from "@/utils/validation";
+import { SignUpSchema } from "@/utils/validation";
+import { useRegisterUser } from "@/hooks/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { SignUp } from "@/types";
 
 const SignUpForm = () => {
+  const { toast } = useToast();
+
   const {
     register,
     reset,
     setError,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<TSignUp>({
+  } = useForm<SignUp>({
     resolver: zodResolver(SignUpSchema),
   });
 
-  const onSubmit: SubmitHandler<TSignUp> = (data) => {
-    console.log(data);
+  const { mutateAsync: registerUserAction } = useRegisterUser();
+
+  const onSubmit: SubmitHandler<SignUp> = async (data) => {
+    const res = await registerUserAction({
+      email: data.email,
+      age: parseInt(data.age.toString()),
+      name: data.name,
+      password: data.password,
+    });
+
+    if (res.error) {
+      setError("root", {
+        message: res.error.message,
+      });
+      return;
+    }
+
+    toast({
+      title: "User successfully created",
+    });
   };
 
   return (
@@ -41,8 +64,8 @@ const SignUpForm = () => {
         </CardHeader>
         <CardContent>
           <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
+            <div className="flex flex-row justify-between gap-4">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="username">Username</Label>
                 <Input
                   id="username"
@@ -55,10 +78,10 @@ const SignUpForm = () => {
                   </span>
                 )}
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Age</Label>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="age">Age</Label>
                 <Input
-                  id="password"
+                  id="age"
                   type="number"
                   defaultValue={18}
                   min={0}
@@ -71,7 +94,7 @@ const SignUpForm = () => {
                 )}
               </div>
             </div>
-            <div className="grid gap-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
@@ -86,7 +109,7 @@ const SignUpForm = () => {
               )}
             </div>
 
-            <div className="grid gap-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" {...register("password")} />
               {errors.password && (
@@ -95,7 +118,7 @@ const SignUpForm = () => {
                 </span>
               )}
             </div>
-            <div className="grid gap-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="confirm-password">Confirm password</Label>
               <Input
                 id="confirm-password"
@@ -109,16 +132,19 @@ const SignUpForm = () => {
               )}
             </div>
 
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
               Create an account
             </Button>
-            <Button variant="outline" className="w-full">
-              Sign up with GitHub
-            </Button>
+
+            {errors.root && (
+              <span className="text-red-500 text-sm">
+                {errors.root.message}
+              </span>
+            )}
           </form>
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
-            <Link href="#" className="underline">
+            <Link href="/signin" className="underline">
               Sign in
             </Link>
           </div>

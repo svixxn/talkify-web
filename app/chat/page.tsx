@@ -1,11 +1,20 @@
+"use client";
+
 import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import ChatCard from "@/components/chats/ChatCard";
 import ChatMessage from "@/components/chats/ChatMessage";
+import { useFetchUserChats } from "@/hooks/react-query";
 
 const ChatPage = () => {
+  const { data: userChats, isLoading } = useFetchUserChats(1);
+
+  console.log(userChats);
+
+  if (isLoading) return <div>Loading...</div>;
+
   return (
     <div className="flex min-h-screen w-full bg-background">
       <div className="hidden w-1/4 border-r bg-muted/40 md:block">
@@ -14,12 +23,16 @@ const ChatPage = () => {
         </div>
         <div className="flex-1 overflow-auto">
           <div className="space-y-1 p-4">
-            <ChatCard
-              name="Acme Inc"
-              profilePictureSrc="/placeholder-user.jpg"
-              message="Hey, hows it going? I wanted to follow up on the project we discussed earlier."
-              time="2:30 PM"
-            />
+            {userChats?.data &&
+              userChats.data.userChats.map((chat) => (
+                <ChatCard
+                  key={chat.chatId}
+                  name={chat.name}
+                  profilePictureSrc={chat.photo}
+                  message={chat.lastMessage}
+                  time="2:30 PM"
+                />
+              ))}
           </div>
         </div>
       </div>

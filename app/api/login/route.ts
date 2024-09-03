@@ -1,4 +1,5 @@
 import { loginUser } from "@/hooks/react-query/functions";
+import { authTokenName } from "@/utils/constants";
 import { addTimeToDate } from "@/utils/general";
 import { SignInSchema } from "@/utils/validation";
 
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
 
   return new Response(JSON.stringify({ message: "success" }), {
     headers: {
-      "Set-Cookie": `authtoken=${token};expires=${finalExpiresData.toUTCString()};path=/`,
+      "Set-Cookie": `${authTokenName}=${token};expires=${finalExpiresData.toUTCString()};path=/`,
     },
   });
 }

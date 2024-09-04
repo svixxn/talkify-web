@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { parseMessageDate } from "@/utils/general";
 
 type ChatCardProps = {
   name: string;
@@ -28,7 +29,9 @@ const ChatCard = ({
         <div className="font-medium">{name}</div>
         <div className="text-muted-foreground">{message}</div>
       </div>
-      <div className="text-xs text-muted-foreground">{time}</div>
+      <div className="text-xs text-muted-foreground">
+        {parseMessageDate(time)}
+      </div>
     </Link>
   );
 };

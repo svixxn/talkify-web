@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,14 +5,12 @@ import { Button } from "@/components/ui/button";
 import ChatCard from "@/components/chats/ChatCard";
 import ChatMessage from "@/components/chats/ChatMessage";
 import { useFetchUserChats } from "@/hooks/react-query";
+import { getUserChats } from "@/hooks/react-query/functions";
+import ChatList from "@/components/chats/ChatList";
+import { redirect } from "next/navigation";
+import ErrorPage from "@/components/shared/ErrorPage";
 
-const ChatPage = () => {
-  const { data: userChats, isLoading } = useFetchUserChats(1);
-
-  console.log(userChats);
-
-  if (isLoading) return <div>Loading...</div>;
-
+const ChatPage = async () => {
   return (
     <div className="flex min-h-screen w-full bg-background">
       <div className="hidden w-1/4 border-r bg-muted/40 md:block">
@@ -22,25 +18,14 @@ const ChatPage = () => {
           <h3 className="text-lg font-semibold">Chats</h3>
         </div>
         <div className="flex-1 overflow-auto">
-          <div className="space-y-1 p-4">
-            {userChats?.data &&
-              userChats.data.userChats.map((chat) => (
-                <ChatCard
-                  key={chat.chatId}
-                  name={chat.name}
-                  profilePictureSrc={chat.photo}
-                  message={chat.lastMessage}
-                  time="2:30 PM"
-                />
-              ))}
-          </div>
+          <ChatList />
         </div>
       </div>
       <div className="flex flex-1 flex-col">
         <div className="flex h-14 items-center border-b px-4 md:px-6">
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8 border">
-              <AvatarImage src="/placeholder-user.jpg" alt="Avatar" />
+              {/* <AvatarImage src="/placeholder-user.jpg" alt="Avatar" /> */}
               <AvatarFallback>AC</AvatarFallback>
             </Avatar>
             <div className="font-medium">Acme Inc</div>
@@ -51,7 +36,7 @@ const ChatPage = () => {
             <ChatMessage
               message="test"
               isCurrentUserSender={false}
-              avatar="text.jpg"
+              // avatar="text.jpg"
               avatarFallback="MA"
               timestamp={new Date()}
             />

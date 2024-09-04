@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "react-query";
 import { getUserChats, loginUser, registerUser } from "./functions";
-import { SignIn, SignUp } from "@/types";
+import { GeneralChatInfo, SignIn, SignUp } from "@/types";
 
 export const useRegisterUser = () => {
   return useMutation({
@@ -11,7 +11,7 @@ export const useRegisterUser = () => {
 
 export const useFetchUserChats = (userId: number) => {
   return useQuery({
-    queryKey: ["chats", userId],
+    queryKey: ["chats"],
     queryFn: getUserChats,
   });
 };

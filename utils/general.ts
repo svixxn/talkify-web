@@ -30,3 +30,50 @@ export function getCookie(name: string) {
     return parts.pop()?.split(";").shift();
   }
 }
+
+export const parseMessageDate = (timestamp: string) => {
+  const date = new Date(timestamp);
+  const offset = date.getTimezoneOffset();
+
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - offset);
+
+  const diff = now.getTime() - date.getTime();
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (seconds < 60) {
+    return "Just now";
+  } else if (minutes < 60) {
+    return `${minutes}m`;
+  } else if (hours < 24) {
+    return `${hours}h`;
+  } else if (days === 1) {
+    return "Yesterday";
+  } else if (days < 30) {
+    return `${days}d`;
+  } else {
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    const day = date.getDate();
+    const monthIndex = date.getMonth();
+    const year = date.getFullYear();
+
+    return `${day} ${monthNames[monthIndex]}, ${year}`;
+  }
+};

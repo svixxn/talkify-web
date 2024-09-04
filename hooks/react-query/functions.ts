@@ -1,7 +1,7 @@
 import { GeneralChatInfo, SignIn, SignUp } from "@/types";
 import { API_BASE_URL, authTokenName } from "@/utils/constants";
 import { getCookie } from "@/utils/general";
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 
 type FetchChatsResponse = {
   message: string;
@@ -17,8 +17,11 @@ export const registerUser = async (
   data: Omit<SignUp, "confirmPassword">
 ): Promise<DefaultApiResponse<any>> => {
   try {
-    const res = await axios.post(`${API_BASE_URL}/users`, data);
-    return { data: res.data };
+    const res: AxiosResponse<FetchChatsResponse> = await axios.post(
+      `${API_BASE_URL}/users`,
+      data
+    );
+    return { data: res.data.userChats };
   } catch (err) {
     const error = err as AxiosError;
     return { error: error.response?.data };
@@ -38,7 +41,7 @@ export const loginUser = async (
 };
 
 export const getUserChats = async (): Promise<
-  DefaultApiResponse<FetchChatsResponse>
+  DefaultApiResponse<GeneralChatInfo[]>
 > => {
   try {
     const res = await axios.get(`${API_BASE_URL}/chats`, {
@@ -46,9 +49,10 @@ export const getUserChats = async (): Promise<
         Authorization: "Bearer " + getCookie(authTokenName),
       },
     });
-    return { data: res.data };
+
+    return { data: res.data.userChats };
   } catch (err) {
     const error = err as AxiosError;
-    return { error: error.response?.data };
+    return { error: error };
   }
 };

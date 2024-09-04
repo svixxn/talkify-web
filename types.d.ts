@@ -8,4 +8,5 @@ export type GeneralChatInfo = {
   name: string;
   photo: string;
   lastMessage: string;
+  lastMessageDate: string;
 };

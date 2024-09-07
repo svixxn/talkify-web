@@ -1,5 +1,10 @@
 import { useMutation, useQuery } from "react-query";
-import { getUserChats, loginUser, registerUser } from "./functions";
+import {
+  getChatInfo,
+  getUserChats,
+  loginUser,
+  registerUser,
+} from "./functions";
 import { GeneralChatInfo, SignIn, SignUp } from "@/types";
 
 export const useRegisterUser = () => {
@@ -13,5 +18,12 @@ export const useFetchUserChats = (userId: number) => {
   return useQuery({
     queryKey: ["chats"],
     queryFn: getUserChats,
+  });
+};
+
+export const useFetchChatInfo = (chatId: number) => {
+  return useQuery({
+    queryKey: ["chatInfo", chatId],
+    queryFn: () => getChatInfo(chatId),
   });
 };

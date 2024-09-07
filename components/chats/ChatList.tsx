@@ -4,12 +4,18 @@ import { useFetchUserChats } from "@/hooks/react-query";
 import { GeneralChatInfo } from "@/types";
 import ChatCard from "./ChatCard";
 import ChatItemSkeleton from "./ChatItemSkeleton";
+import { useUserContext } from "../shared/UserContext";
 
-const ChatList = () => {
-  const { data: userChats, isLoading } = useFetchUserChats(1);
+type Props = {
+  chats: GeneralChatInfo[] | undefined;
+  currentChatId: number | null;
+  isLoading: boolean;
+};
+
+const ChatList = ({ chats, isLoading, currentChatId }: Props) => {
   return (
     <div className="p-4">
-      {!userChats?.data && isLoading ? (
+      {!chats || isLoading ? (
         <div className="flex flex-col gap-4">
           {Array.from([1, 2, 3, 4, 5]).map((id) => (
             <ChatItemSkeleton key={id} />
@@ -17,8 +23,10 @@ const ChatList = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-2">
-          {userChats?.data?.map((chat) => (
+          {chats?.map((chat) => (
             <ChatCard
+              id={chat.chatId}
+              isActive={chat.chatId === currentChatId}
               key={chat.chatId}
               name={chat.name}
               message={chat.lastMessage}

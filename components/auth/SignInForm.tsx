@@ -49,12 +49,10 @@ const SignInForm = () => {
 
   return (
     <div className="flex h-screen flex-col p-1 items-center justify-center">
-      <Card className="mx-auto max-w-lg">
+      <Card className="mx-auto w-full max-w-lg">
         <CardHeader>
-          <CardTitle className="text-xl">Sign Up</CardTitle>
-          <CardDescription>
-            Enter your information to create an account
-          </CardDescription>
+          <CardTitle className="text-xl">Sign In</CardTitle>
+          <CardDescription>Enter your information to sign in</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>

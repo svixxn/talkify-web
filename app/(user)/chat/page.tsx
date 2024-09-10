@@ -1,21 +1,16 @@
 "use client";
 
-import Link from "next/link";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import ChatCard from "@/components/chats/ChatCard";
-import ChatMessage from "@/components/chats/ChatMessage";
 import { useFetchUserChats } from "@/hooks/react-query";
-import { getUserChats } from "@/hooks/react-query/functions";
 import ChatList from "@/components/chats/ChatList";
-import { redirect } from "next/navigation";
-import ErrorPage from "@/components/shared/ErrorPage";
 import { useUserContext } from "@/components/shared/UserContext";
 import { useEffect, useState } from "react";
 import { useChatContext } from "@/components/shared/ChatContext";
 import { useToast } from "@/hooks/use-toast";
 import MainChatArea from "@/components/chats/MainChatArea";
+import UserDropdownMenu from "@/components/chats/UserDropdownMenu";
+import ChatItemSkeleton from "@/components/chats/ChatItemSkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
+import MainChatAreaLoader from "@/components/chats/MainChatAreaLoader";
 
 const ChatPage = () => {
   const { toast } = useToast();
@@ -38,7 +33,8 @@ const ChatPage = () => {
   return (
     <div className="flex min-h-screen w-full bg-background">
       <div className="hidden w-1/4 border-r bg-muted/40 md:block">
-        <div className="flex h-14 items-center border-b px-4">
+        <div className="flex flex-row gap-4 h-14 items-center border-b px-4">
+          <UserDropdownMenu username={user?.name} />
           <h3 className="text-lg font-semibold">Chats</h3>
         </div>
         <div className="flex-1 overflow-auto">
@@ -53,8 +49,8 @@ const ChatPage = () => {
       {currentChatId ? (
         <MainChatArea currentChatId={currentChatId} currentUserId={user?.id} />
       ) : (
-        <div className="flex flex-col items-center justify-center w-full">
-          {isLoading ? <span>Loading...</span> : <span> No chats found </span>}
+        <div className="px-4 md:px-6 flex items-center justify-center w-3/4">
+          {isLoading ? <MainChatAreaLoader /> : <span> No chats found </span>}
         </div>
       )}
     </div>

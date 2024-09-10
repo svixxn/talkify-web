@@ -29,7 +29,7 @@ const ChatCard = ({
       onClick={() => setCurrentChatId(id)}
       className={`flex items-center text-left gap-3 rounded-md bg-muted/50 ${
         isActive
-          ? "bg-foreground hover:bg-foreground/75"
+          ? "bg-secondary hover:bg-foreground/75"
           : "bg-muted/50 hover:bg-muted"
       } px-3 py-2 text-sm font-medium transition-colors hover:bg-muted`}
     >
@@ -38,7 +38,7 @@ const ChatCard = ({
         <AvatarFallback>AC</AvatarFallback>
       </Avatar>
       <div className="flex-1 truncate">
-        <div className={`font-medium ${isActive && "text-muted"}`}>{name}</div>
+        <div className={`font-medium`}>{name}</div>
         <div className="text-muted-foreground">{message}</div>
       </div>
       <div className="text-xs text-muted-foreground">

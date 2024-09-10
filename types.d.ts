@@ -22,6 +22,7 @@ export type ChatMessage = {
   messageType: string;
 };
 
+//Users
 export type User = {
   id: number;
   name: string;
@@ -32,4 +33,11 @@ export type User = {
   phone: string | null;
   bio: string | null;
   joinedAt: Date;
+};
+
+export type ChatParticipant = {
+  id: number;
+  name: string;
+  email: string;
+  avatar: string | null;
 };

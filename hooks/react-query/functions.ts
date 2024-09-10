@@ -1,16 +1,13 @@
-import { GeneralChatInfo, SignIn, SignUp } from "@/types";
+import {
+  ChatMessage,
+  ChatParticipant,
+  GeneralChatInfo,
+  SignIn,
+  SignUp,
+} from "@/types";
 import { API_BASE_URL, authTokenName } from "@/utils/constants";
 import { getCookie } from "@/utils/general";
 import axios, { AxiosError, AxiosResponse } from "axios";
-
-type ChatMessage = {
-  id: string;
-  createdAt: Date;
-  senderId: number;
-  chatId: number;
-  content: string;
-  messageType: string;
-};
 
 type FetchChatsResponse = {
   message: string;
@@ -19,7 +16,7 @@ type FetchChatsResponse = {
 
 type FetchChatInfoResponse = {
   message: string;
-  chatInfo: { name: string };
+  chatInfo: { name: string; participants: ChatParticipant[] };
   chatMessages: ChatMessage[];
 };
 

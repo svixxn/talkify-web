@@ -6,8 +6,6 @@ import { SignInSchema } from "@/utils/validation";
 export async function POST(request: Request) {
   const body = await request.json();
 
-  console.log("body", body);
-
   const parseRes = SignInSchema.safeParse(body);
 
   if (!parseRes.success) {
@@ -25,6 +23,14 @@ export async function POST(request: Request) {
   return new Response(JSON.stringify({ message: "success" }), {
     headers: {
       "Set-Cookie": `${authTokenName}=${token};expires=${finalExpiresData.toUTCString()};path=/`,
+    },
+  });
+}
+
+export async function DELETE(request: Request) {
+  return new Response(null, {
+    headers: {
+      "Set-Cookie": `${authTokenName}=deleted;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`,
     },
   });
 }

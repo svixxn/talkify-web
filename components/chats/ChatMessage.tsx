@@ -32,7 +32,7 @@ const ChatMessage = ({
         } text-sm`}
       >
         <p className="py-2 pl-2">{message}</p>
-        <span className="text-[10px] opacity-25 mt-auto p-1">
+        <span className="text-[10px] opacity-80 mt-auto p-1">
           {timestamp.getHours() + ":" + timestamp.getMinutes()}
         </span>
       </div>

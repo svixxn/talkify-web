@@ -4,6 +4,7 @@ import {
   getUserChats,
   loginUser,
   registerUser,
+  searchUsers,
 } from "./functions";
 import { GeneralChatInfo, SignIn, SignUp } from "@/types";
 
@@ -25,5 +26,12 @@ export const useFetchChatInfo = (chatId: number) => {
   return useQuery({
     queryKey: ["chatInfo", chatId],
     queryFn: () => getChatInfo(chatId),
+  });
+};
+
+export const useSearchUsers = (searchValue: string) => {
+  return useQuery({
+    queryKey: ["searchUsers", searchValue],
+    queryFn: () => searchUsers(searchValue),
   });
 };

@@ -35,6 +35,9 @@ import {
 import { GiHamburgerMenu } from "react-icons/gi";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { Dialog, DialogTrigger } from "../ui/dialog";
+import CreateChatModal from "./CreateChatModal";
+import { useState } from "react";
 
 type Props = {
   username: string | undefined;
@@ -42,6 +45,7 @@ type Props = {
 
 const UserDropdownMenu = ({ username }: Props) => {
   const router = useRouter();
+  const [modalOpen, setModalOpen] = useState(false);
 
   const handleLogOut = async () => {
     const res = await axios.delete("/api/login");
@@ -49,43 +53,49 @@ const UserDropdownMenu = ({ username }: Props) => {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">
-          <GiHamburgerMenu size={16} />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 mx-2">
-        <DropdownMenuLabel>{username || "User"}</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
+    <Dialog>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline">
+            <GiHamburgerMenu size={16} />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56 mx-2">
+          <DropdownMenuLabel>{username || "User"}</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem>
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem>
+              <Users className="mr-2 h-4 w-4" />
+              <span>Search users</span>
+            </DropdownMenuItem>
+            <DialogTrigger asChild>
+              <DropdownMenuItem>
+                <Plus className="mr-2 h-4 w-4" />
+                <span>New Chat</span>
+              </DropdownMenuItem>
+            </DialogTrigger>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleLogOut}>
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log out</span>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <Users className="mr-2 h-4 w-4" />
-            <span>Search users</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Plus className="mr-2 h-4 w-4" />
-            <span>New Chat</span>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogOut}>
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <CreateChatModal />
+    </Dialog>
   );
 };
 

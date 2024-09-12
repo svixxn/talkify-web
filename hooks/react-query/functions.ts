@@ -9,6 +9,11 @@ import { API_BASE_URL, authTokenName } from "@/utils/constants";
 import { getCookie } from "@/utils/general";
 import axios, { AxiosError, AxiosResponse } from "axios";
 
+type SearchUsersResponse = {
+  message: string;
+  users: { id: string; avatar: string; name: string }[];
+};
+
 type FetchChatsResponse = {
   message: string;
   userChats: GeneralChatInfo[];
@@ -78,6 +83,26 @@ export const getChatInfo = async (
         Authorization: "Bearer " + getCookie(authTokenName),
       },
     });
+
+    return { data: res.data };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { error: error.response?.data };
+  }
+};
+
+export const searchUsers = async (
+  searchValue: string
+): Promise<DefaultApiResponse<SearchUsersResponse>> => {
+  try {
+    const res = await axios.get(
+      `${API_BASE_URL}/users/search?s=${searchValue}`,
+      {
+        headers: {
+          Authorization: "Bearer " + getCookie(authTokenName),
+        },
+      }
+    );
 
     return { data: res.data };
   } catch (err) {

@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "react-query";
 import {
+  createChat,
   getChatInfo,
   getUserChats,
   loginUser,
@@ -7,6 +8,7 @@ import {
   searchUsers,
 } from "./functions";
 import { GeneralChatInfo, SignIn, SignUp } from "@/types";
+import { CreateChat } from "@/lib/validations";
 
 export const useRegisterUser = () => {
   return useMutation({
@@ -33,5 +35,12 @@ export const useSearchUsers = (searchValue: string) => {
   return useQuery({
     queryKey: ["searchUsers", searchValue],
     queryFn: () => searchUsers(searchValue),
+  });
+};
+
+export const useCreateChat = () => {
+  return useMutation({
+    mutationKey: ["createChat"],
+    mutationFn: (data: CreateChat) => createChat(data),
   });
 };

@@ -21,8 +21,17 @@ import {
 import { useSearchUsers } from "@/hooks/react-query";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
+import { CreateChat } from "@/lib/validations";
+import { FormControl } from "../ui/form";
 
-const SearchUsersInput = () => {
+type Props = {
+  // errors: FieldErrors<CreateChat>;
+  value: number[] | undefined;
+  setValue: UseFormSetValue<CreateChat>;
+};
+
+const SearchUsersInput = ({ value, setValue }: Props) => {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
@@ -32,24 +41,21 @@ const SearchUsersInput = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between"
-        >
-          {selectedValue || "Search people..."}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
+        <FormControl>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between"
+          >
+            {selectedValue || "Search people..."}
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </FormControl>
       </PopoverTrigger>
       <PopoverContent className="p-0 w-full">
         <Command>
-          <CommandInput
-            placeholder="Search people..."
-            // onValueChange={(s) => {
-            //   setSearchValue(s);
-            // }}
-          />
+          <CommandInput placeholder="Search people..." />
           <CommandList>
             <CommandEmpty>No user found.</CommandEmpty>
             <CommandGroup>
@@ -57,8 +63,9 @@ const SearchUsersInput = () => {
                 <CommandItem
                   key={user.id}
                   value={user.name}
-                  onSelect={(currentValue) => {
-                    setSelectedValue(currentValue);
+                  onSelect={(name) => {
+                    setValue("users", [user.id]);
+                    setSelectedValue(name);
                     setOpen(false);
                   }}
                 >

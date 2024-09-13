@@ -1,3 +1,4 @@
+import { CreateChat } from "@/lib/validations";
 import {
   ChatMessage,
   ChatParticipant,
@@ -11,7 +12,7 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 
 type SearchUsersResponse = {
   message: string;
-  users: { id: string; avatar: string; name: string }[];
+  users: { id: number; avatar: string; name: string }[];
 };
 
 type FetchChatsResponse = {
@@ -103,6 +104,23 @@ export const searchUsers = async (
         },
       }
     );
+
+    return { data: res.data };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { error: error.response?.data };
+  }
+};
+
+export const createChat = async (
+  data: CreateChat
+): Promise<DefaultApiResponse<any>> => {
+  try {
+    const res = await axios.post(`${API_BASE_URL}/chats`, data, {
+      headers: {
+        Authorization: "Bearer " + getCookie(authTokenName),
+      },
+    });
 
     return { data: res.data };
   } catch (err) {

@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { useForm, SubmitHandler } from "react-hook-form";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SignUpSchema } from "@/utils/validation";
+import { SignUpSchema } from "@/lib/validations";
 import { useRegisterUser } from "@/hooks/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { SignUp } from "@/types";

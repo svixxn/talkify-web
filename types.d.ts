@@ -9,8 +9,8 @@ export type GeneralChatInfo = {
   chatId: number;
   name: string;
   photo: string;
-  lastMessage: string;
-  lastMessageDate: string;
+  lastMessage: string | null;
+  lastMessageDate: string | null;
 };
 
 export type ChatMessage = {

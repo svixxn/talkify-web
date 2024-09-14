@@ -1,21 +1,6 @@
 "use client";
 
-import {
-  Cloud,
-  CreditCard,
-  Github,
-  Keyboard,
-  LifeBuoy,
-  LogOut,
-  Mail,
-  MessageSquare,
-  Plus,
-  PlusCircle,
-  Settings,
-  User,
-  UserPlus,
-  Users,
-} from "lucide-react";
+import { LogOut, Menu, Plus, Settings, User, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -32,7 +17,6 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { GiHamburgerMenu } from "react-icons/gi";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogTrigger } from "../ui/dialog";
@@ -44,8 +28,8 @@ type Props = {
 };
 
 const UserDropdownMenu = ({ username }: Props) => {
-  const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
+  const router = useRouter();
 
   const handleLogOut = async () => {
     const res = await axios.delete("/api/login");
@@ -53,11 +37,11 @@ const UserDropdownMenu = ({ username }: Props) => {
   };
 
   return (
-    <Dialog>
+    <Dialog open={modalOpen} onOpenChange={setModalOpen}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline">
-            <GiHamburgerMenu size={16} />
+            <Menu size={16} />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56 mx-2">
@@ -80,7 +64,7 @@ const UserDropdownMenu = ({ username }: Props) => {
               <span>Search users</span>
             </DropdownMenuItem>
             <DialogTrigger asChild>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setModalOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
                 <span>New Chat</span>
               </DropdownMenuItem>
@@ -94,7 +78,7 @@ const UserDropdownMenu = ({ username }: Props) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <CreateChatModal />
+      <CreateChatModal open={modalOpen} setOpen={setModalOpen} />
     </Dialog>
   );
 };

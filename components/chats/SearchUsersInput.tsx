@@ -18,7 +18,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useSearchUsers } from "@/hooks/react-query";
+import {
+  useSearchUsers,
+  useSearchUsersToCreateChat,
+} from "@/hooks/react-query";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
@@ -36,7 +39,7 @@ const SearchUsersInput = ({ value, setValue }: Props) => {
   const [searchValue, setSearchValue] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
 
-  const { data: users, error, isLoading } = useSearchUsers(searchValue);
+  const { data: users } = useSearchUsersToCreateChat();
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

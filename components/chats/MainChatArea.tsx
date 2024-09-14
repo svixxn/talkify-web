@@ -1,8 +1,9 @@
 import { useFetchChatInfo } from "@/hooks/react-query";
-import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import ChatMessage from "./ChatMessage";
+import ChatDropdownMenu from "./ChatDropdownMenu";
 
 type Props = {
   currentChatId: number;
@@ -17,9 +18,14 @@ const MainChatArea = ({ currentChatId, currentUserId }: Props) => {
       <div className="flex h-14 items-center border-b px-4 md:px-6">
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8 border">
+            <AvatarImage src={chatInfo?.data?.chatInfo.photo} alt="Avatar" />
             <AvatarFallback>AC</AvatarFallback>
           </Avatar>
           <div className="font-medium">{chatInfo?.data?.chatInfo.name}</div>
+        </div>
+
+        <div className="ml-auto">
+          <ChatDropdownMenu chatId={currentChatId} />
         </div>
       </div>
       <div className="flex-1 overflow-auto p-4 md:p-6">
@@ -29,7 +35,6 @@ const MainChatArea = ({ currentChatId, currentUserId }: Props) => {
               key={message.id}
               message={message.content}
               isCurrentUserSender={currentUserId === message.senderId}
-              // avatar="text.jpg"
               avatarFallback="MA"
               timestamp={new Date()}
             />

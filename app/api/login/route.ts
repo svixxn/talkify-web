@@ -1,7 +1,7 @@
 import { loginUser } from "@/hooks/react-query/functions";
 import { authTokenName } from "@/utils/constants";
 import { addTimeToDate } from "@/utils/general";
-import { SignInSchema } from "@/utils/validation";
+import { SignInSchema } from "@/lib/validations";
 
 export async function POST(request: Request) {
   const body = await request.json();

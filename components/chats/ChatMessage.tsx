@@ -20,10 +20,10 @@ const ChatMessage = ({
         isCurrentUserSender && "justify-end"
       }`}
     >
-      {/* <Avatar className="h-10 w-10 border">
+      <Avatar className="h-10 w-10 border">
         <AvatarImage src={avatar} alt="Avatar" />
         <AvatarFallback>{avatarFallback}</AvatarFallback>
-      </Avatar> */}
+      </Avatar>
       <div
         className={`rounded-md flex items-center gap-2 ${
           isCurrentUserSender

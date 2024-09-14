@@ -19,22 +19,48 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Plus } from "lucide-react";
 import { DropdownMenuItem } from "../ui/dropdown-menu";
 import SearchUsersInput from "./SearchUsersInput";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import z from "zod";
 import { CreateChat, CreateChatSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormField, FormItem, FormLabel } from "../ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
+import { useCreateChat } from "@/hooks/react-query";
+import { useToast } from "@/hooks/use-toast";
+import MultipleItemSelector from "../shared/MultipleItemSelector";
 
-const CreateChatModal = () => {
+type Props = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+};
+
+const CreateChatModal = ({ open, setOpen }: Props) => {
+  const { toast } = useToast();
+
   const form = useForm<CreateChat>({
     resolver: zodResolver(CreateChatSchema),
   });
 
-  const onSubmit = async (data: CreateChat) => {
-    console.log(data);
+  const { mutateAsync: createChatAction } = useCreateChat();
+
+  const onSubmit: SubmitHandler<CreateChat> = async (data) => {
+    const res = await createChatAction(data);
+
+    if (res.error) {
+      form.setError("root", {
+        message: res.error.message,
+      });
+      return;
+    }
+
+    toast({
+      title: "Chat successfully created",
+    });
+
+    form.reset();
+
+    setOpen(false);
   };
 
   return (
@@ -57,13 +83,16 @@ const CreateChatModal = () => {
             </TabsList>
             <TabsContent value="private">
               <Card>
-                <CardContent className="flex flex-col gap-3 pt-6">
-                  <FormLabel>Search for people to start chat with</FormLabel>
+                <CardContent className="flex flex-col gap-4 py-4">
                   <FormField
                     control={form.control}
                     name="users"
                     render={({ field }) => (
-                      <FormItem className="space-y-1">
+                      <FormItem>
+                        <FormLabel>
+                          Search for people to start chat with
+                        </FormLabel>
+
                         <SearchUsersInput
                           value={field.value}
                           setValue={form.setValue}
@@ -81,32 +110,57 @@ const CreateChatModal = () => {
             </TabsContent>
             <TabsContent value="group">
               <Card>
-                <CardHeader>
-                  <CardTitle>Password</CardTitle>
-                  <CardDescription>
-                    Change your password here. After saving, you&apos;ll be
-                    logged out.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="space-y-1">
-                    <Label htmlFor="current">Current password</Label>
-                    <Input id="current" type="password" />
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="new">New password</Label>
-                    <Input id="new" type="password" />
-                  </div>
+                <CardContent className="flex flex-col gap-4 py-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Chat name</FormLabel>
+                        <Input
+                          placeholder="Your chat name..."
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                        {form.formState.errors.name && (
+                          <span className="text-red-500 text-xs">
+                            {form.formState.errors.name.message}
+                          </span>
+                        )}
+                      </FormItem>
+                    )}
+                  ></FormField>
+
+                  <FormField
+                    control={form.control}
+                    name="users"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Users to add in chat</FormLabel>
+                        <MultipleItemSelector
+                          value={field.value}
+                          setValue={form.setValue}
+                        />
+                        {form.formState.errors.users && (
+                          <span className="text-red-500 text-xs">
+                            {form.formState.errors.users.message}
+                          </span>
+                        )}
+                      </FormItem>
+                    )}
+                  ></FormField>
                 </CardContent>
-                <CardFooter>
-                  <Button>Save password</Button>
-                </CardFooter>
               </Card>
             </TabsContent>
           </Tabs>
           <DialogFooter>
             <Button type="submit">Create chat</Button>
           </DialogFooter>
+          {form.formState.errors.root && (
+            <span className="text-red-500 text-xs">
+              {form.formState.errors.root.message}
+            </span>
+          )}
         </form>
       </Form>
     </DialogContent>

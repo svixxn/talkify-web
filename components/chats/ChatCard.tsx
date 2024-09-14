@@ -9,8 +9,8 @@ type ChatCardProps = {
   id: number;
   name: string;
   profilePictureSrc: string;
-  message: string;
-  time: string;
+  message: string | null;
+  time: string | null;
   isActive: boolean;
 };
 
@@ -42,7 +42,7 @@ const ChatCard = ({
         <div className="text-muted-foreground">{message}</div>
       </div>
       <div className="text-xs text-muted-foreground">
-        {parseMessageDate(time)}
+        {time && parseMessageDate(time)}
       </div>
     </button>
   );

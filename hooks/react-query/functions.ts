@@ -22,7 +22,7 @@ type FetchChatsResponse = {
 
 type FetchChatInfoResponse = {
   message: string;
-  chatInfo: { name: string; participants: ChatParticipant[] };
+  chatInfo: { name: string; photo: string; participants: ChatParticipant[] };
   chatMessages: ChatMessage[];
 };
 
@@ -30,7 +30,7 @@ type DefaultApiResponse<T> = {
   data?: T;
   error?: any;
 };
-
+// users
 export const registerUser = async (
   data: Omit<SignUp, "confirmPassword">
 ): Promise<DefaultApiResponse<any>> => {
@@ -58,6 +58,27 @@ export const loginUser = async (
   }
 };
 
+export const searchUsers = async (
+  searchValue: string
+): Promise<DefaultApiResponse<SearchUsersResponse>> => {
+  try {
+    const res = await axios.get(
+      `${API_BASE_URL}/users/search?s=${searchValue}`,
+      {
+        headers: {
+          Authorization: "Bearer " + getCookie(authTokenName),
+        },
+      }
+    );
+
+    return { data: res.data };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { error: error.response?.data };
+  }
+};
+
+//chats
 export const getUserChats = async (): Promise<
   DefaultApiResponse<GeneralChatInfo[]>
 > => {
@@ -92,18 +113,16 @@ export const getChatInfo = async (
   }
 };
 
-export const searchUsers = async (
-  searchValue: string
-): Promise<DefaultApiResponse<SearchUsersResponse>> => {
+
+export const searchUsersToCreateChat = async (): Promise<
+  DefaultApiResponse<SearchUsersResponse>
+> => {
   try {
-    const res = await axios.get(
-      `${API_BASE_URL}/users/search?s=${searchValue}`,
-      {
-        headers: {
-          Authorization: "Bearer " + getCookie(authTokenName),
-        },
-      }
-    );
+    const res = await axios.get(`${API_BASE_URL}/users/searchToCreateChat`, {
+      headers: {
+        Authorization: "Bearer " + getCookie(authTokenName),
+      },
+    });
 
     return { data: res.data };
   } catch (err) {
@@ -128,3 +147,21 @@ export const createChat = async (
     return { error: error.response?.data };
   }
 };
+
+export const deleteChat = async (
+  chatId: number
+): Promise<DefaultApiResponse<any>> => {
+  try {
+    const res = await axios.delete(`${API_BASE_URL}/chats/${chatId}`, {
+      headers: {
+        Authorization: "Bearer " + getCookie(authTokenName),
+      },
+    });
+
+    return { data: res.data };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { error: error.response?.data };
+  }
+};
+

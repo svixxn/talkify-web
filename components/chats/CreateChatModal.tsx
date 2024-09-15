@@ -40,11 +40,15 @@ const CreateChatModal = ({ open, setOpen }: Props) => {
 
   const form = useForm<CreateChat>({
     resolver: zodResolver(CreateChatSchema),
+    defaultValues: {
+      name: "",
+    },
   });
 
   const { mutateAsync: createChatAction } = useCreateChat();
 
   const onSubmit: SubmitHandler<CreateChat> = async (data) => {
+    console.log("data", data);
     const res = await createChatAction(data);
 
     if (res.error) {

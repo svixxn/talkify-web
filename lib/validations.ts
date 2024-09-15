@@ -2,8 +2,10 @@ import { z } from "zod";
 
 export const CreateChatSchema = z
   .object({
-    users: z.array(z.number(), { message: "Please select at least one user" }),
-    name: z.string().optional(),
+    users: z
+      .array(z.number())
+      .min(1, "Please select at least one user to create chat with"),
+    name: z.string().default(""),
   })
   .refine(
     (s) => {
@@ -11,6 +13,16 @@ export const CreateChatSchema = z
       else return true;
     },
     { message: "Please provide a chat name", path: ["name"] }
+  )
+  .refine(
+    (s) => {
+      if (s.name && s.users.length < 2) return false;
+      else return true;
+    },
+    {
+      message: "Please select at least two users to create group chat",
+      path: ["users"],
+    }
   );
 
 export type CreateChat = z.infer<typeof CreateChatSchema>;

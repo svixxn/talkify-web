@@ -7,7 +7,7 @@ import { User } from "@/types";
 
 export type ChatContext = {
   currentChatId: number | null;
-  setCurrentChatId: (id: number) => void;
+  setCurrentChatId: (id: number | null) => void;
 };
 
 const ctx: ChatContext = {

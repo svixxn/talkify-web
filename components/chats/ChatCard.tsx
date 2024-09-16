@@ -29,7 +29,7 @@ const ChatCard = ({
       onClick={() => setCurrentChatId(id)}
       className={`flex items-center text-left gap-3 rounded-md bg-muted/50 ${
         isActive
-          ? "bg-secondary hover:bg-foreground/75"
+          ? "bg-neutral-700 hover:bg-foreground/75"
           : "bg-muted/50 hover:bg-muted"
       } px-3 py-2 text-sm font-medium transition-colors hover:bg-muted`}
     >

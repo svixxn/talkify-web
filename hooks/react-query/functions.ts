@@ -79,11 +79,11 @@ export const searchUsers = async (
 };
 
 //chats
-export const getUserChats = async (): Promise<
-  DefaultApiResponse<GeneralChatInfo[]>
-> => {
+export const getUserChats = async (
+  searchValue: string
+): Promise<DefaultApiResponse<GeneralChatInfo[]>> => {
   try {
-    const res = await axios.get(`${API_BASE_URL}/chats`, {
+    const res = await axios.get(`${API_BASE_URL}/chats?s=${searchValue}`, {
       headers: {
         Authorization: "Bearer " + getCookie(authTokenName),
       },
@@ -112,7 +112,6 @@ export const getChatInfo = async (
     return { error: error.response?.data };
   }
 };
-
 
 export const searchUsersToCreateChat = async (): Promise<
   DefaultApiResponse<SearchUsersResponse>
@@ -164,4 +163,3 @@ export const deleteChat = async (
     return { error: error.response?.data };
   }
 };
-

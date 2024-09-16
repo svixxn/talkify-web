@@ -33,6 +33,7 @@ import {
 import { useState } from "react";
 import { useDeleteChat } from "@/hooks/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { useChatContext } from "../shared/ChatContext";
 
 type Props = {
   chatId: number;
@@ -41,6 +42,7 @@ type Props = {
 const ChatDropdownMenu = ({ chatId }: Props) => {
   const { toast } = useToast();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const { setCurrentChatId } = useChatContext();
 
   const { mutateAsync: deleteChatAction } = useDeleteChat();
 
@@ -59,6 +61,7 @@ const ChatDropdownMenu = ({ chatId }: Props) => {
       title: "Chat successfully deleted",
     });
 
+    setCurrentChatId(null);
     setDeleteModalOpen(false);
   };
 

@@ -1,6 +1,14 @@
 "use client";
 
-import { LogOut, Menu, Plus, Settings, User, Users } from "lucide-react";
+import {
+  LogOut,
+  Menu,
+  MessageSquare,
+  Plus,
+  Settings,
+  User,
+  Users,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -9,18 +17,13 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Dialog, DialogTrigger } from "../ui/dialog";
-import CreateChatModal from "./CreateChatModal";
+import CreateChatModal from "../chats/CreateChatModal";
 import { useState } from "react";
 
 type Props = {
@@ -30,6 +33,7 @@ type Props = {
 const UserDropdownMenu = ({ username }: Props) => {
   const [modalOpen, setModalOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogOut = async () => {
     const res = await axios.delete("/api/login");
@@ -48,14 +52,17 @@ const UserDropdownMenu = ({ username }: Props) => {
           <DropdownMenuLabel>{username || "User"}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              <span>Profile</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
-            </DropdownMenuItem>
+            {pathname.includes("home") ? (
+              <DropdownMenuItem onClick={() => router.push("/chat")}>
+                <MessageSquare className="mr-2 h-4 w-4" />
+                <span>Chat</span>
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem onClick={() => router.push("/home")}>
+                <User className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </DropdownMenuItem>
+            )}
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>

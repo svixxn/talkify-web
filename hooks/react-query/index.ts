@@ -19,10 +19,10 @@ export const useRegisterUser = () => {
   });
 };
 
-export const useFetchUserChats = (userId: number) => {
+export const useFetchUserChats = (searchValue: string) => {
   return useQuery({
-    queryKey: ["chats"],
-    queryFn: getUserChats,
+    queryKey: ["chats", { searchValue }],
+    queryFn: () => getUserChats(searchValue),
   });
 };
 

@@ -1,9 +1,18 @@
-import { useFetchChatInfo } from "@/hooks/react-query";
+import {
+  useFetchChatInfo,
+  useFetchChatMessages,
+  useSendMessage,
+} from "@/hooks/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import ChatMessage from "./ChatMessage";
 import ChatDropdownMenu from "./ChatDropdownMenu";
+import { useEffect, useRef } from "react";
+import { useSocket } from "../shared/SocketProvider";
+import { ChatMessage as ChatMessageType } from "@/types";
+import { useQueryClient } from "react-query";
+// import useSocket from "@/hooks/useSocket";
 
 type Props = {
   currentChatId: number;
@@ -12,6 +21,55 @@ type Props = {
 
 const MainChatArea = ({ currentChatId, currentUserId }: Props) => {
   const { data: chatInfo, isLoading } = useFetchChatInfo(currentChatId);
+  const { data: chatMessages } = useFetchChatMessages(currentChatId);
+  const chatInputRef = useRef<HTMLTextAreaElement>(null);
+  const socket = useSocket();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.emit("join-chat", currentChatId);
+
+    const handleReceivedMessage = (data: any) => {
+      queryClient.setQueryData(
+        ["chatMessages", currentChatId],
+        (oldData: any) => {
+          return {
+            data: [...(oldData?.data || []), JSON.parse(data)],
+          };
+        }
+      );
+    };
+
+    socket.on("received-message", handleReceivedMessage);
+
+    return () => {
+      socket.off("received-message", handleReceivedMessage);
+    };
+  }, [socket, currentChatId, queryClient]);
+
+  const { mutateAsync: sendMessage } = useSendMessage();
+
+  const handleSendMessage = async () => {
+    if (!chatInputRef.current || chatInputRef.current?.value.trim() === "")
+      return;
+
+    const newMessage = chatInputRef.current.value;
+
+    chatInputRef.current.value = "";
+
+    const data = await sendMessage({
+      chatId: currentChatId,
+      content: newMessage,
+      messageType: "text",
+    });
+
+    socket?.emit(
+      "chat-message",
+      JSON.stringify(data.data.message as ChatMessageType)
+    );
+  };
 
   return (
     <div className="flex flex-1 flex-col">
@@ -30,7 +88,7 @@ const MainChatArea = ({ currentChatId, currentUserId }: Props) => {
       </div>
       <div className="flex-1 overflow-auto p-4 md:p-6">
         <div className="grid gap-4">
-          {chatInfo?.data?.chatMessages.map((message) => (
+          {chatMessages?.data?.map((message) => (
             <ChatMessage
               key={message.id}
               message={message.content}
@@ -44,10 +102,15 @@ const MainChatArea = ({ currentChatId, currentUserId }: Props) => {
       <div className="sticky bottom-0 bg-background px-4 py-2 md:px-6">
         <div className="relative flex items-center gap-2">
           <Textarea
+            ref={chatInputRef}
             placeholder="Type your message..."
             className="h-10 flex-1 resize-none rounded-md border border-input bg-transparent pr-12 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
           />
-          <Button type="submit" size="icon" className="absolute right-2">
+          <Button
+            onClick={handleSendMessage}
+            size="icon"
+            className="absolute right-2"
+          >
             <SendIcon className="h-4 w-4" />
             <span className="sr-only">Send</span>
           </Button>

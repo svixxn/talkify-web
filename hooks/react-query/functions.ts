@@ -23,7 +23,6 @@ type FetchChatsResponse = {
 type FetchChatInfoResponse = {
   message: string;
   chatInfo: { name: string; photo: string; participants: ChatParticipant[] };
-  chatMessages: ChatMessage[];
 };
 
 type DefaultApiResponse<T> = {
@@ -158,6 +157,49 @@ export const deleteChat = async (
     });
 
     return { data: res.data };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { error: error.response?.data };
+  }
+};
+
+export const sendChatMessage = async (data: {
+  content: string;
+  messageType: string;
+  chatId: number;
+}): Promise<DefaultApiResponse<any>> => {
+  try {
+    const res = await axios.post(
+      `${API_BASE_URL}/chats/${data.chatId}/messages`,
+      {
+        content: data.content,
+        messageType: data.messageType,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + getCookie(authTokenName),
+        },
+      }
+    );
+
+    return { data: res.data };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { error: error.response?.data };
+  }
+};
+
+export const getChatMessages = async (
+  chatId: number
+): Promise<DefaultApiResponse<ChatMessage[]>> => {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/chats/${chatId}/messages`, {
+      headers: {
+        Authorization: "Bearer " + getCookie(authTokenName),
+      },
+    });
+
+    return { data: res.data.messages };
   } catch (err) {
     const error = err as AxiosError;
     return { error: error.response?.data };

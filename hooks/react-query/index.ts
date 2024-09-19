@@ -3,11 +3,13 @@ import {
   createChat,
   deleteChat,
   getChatInfo,
+  getChatMessages,
   getUserChats,
   loginUser,
   registerUser,
   searchUsers,
   searchUsersToCreateChat,
+  sendChatMessage,
 } from "./functions";
 import { GeneralChatInfo, SignIn, SignUp } from "@/types";
 import { CreateChat } from "@/lib/validations";
@@ -30,6 +32,13 @@ export const useFetchChatInfo = (chatId: number) => {
   return useQuery({
     queryKey: ["chatInfo", chatId],
     queryFn: () => getChatInfo(chatId),
+  });
+};
+
+export const useFetchChatMessages = (chatId: number) => {
+  return useQuery({
+    queryKey: ["chatMessages", chatId],
+    queryFn: () => getChatMessages(chatId),
   });
 };
 
@@ -68,5 +77,16 @@ export const useDeleteChat = () => {
     onSuccess: () => {
       queryClient.invalidateQueries("chats");
     },
+  });
+};
+
+export const useSendMessage = () => {
+  return useMutation({
+    mutationKey: ["sendMessage"],
+    mutationFn: (data: {
+      content: string;
+      messageType: string;
+      chatId: number;
+    }) => sendChatMessage(data),
   });
 };

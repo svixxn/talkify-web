@@ -12,6 +12,7 @@ import { useEffect, useRef } from "react";
 import { useSocket } from "../shared/SocketProvider";
 import { ChatMessage as ChatMessageType } from "@/types";
 import { useQueryClient } from "react-query";
+import { ScrollArea } from "../ui/scroll-area";
 // import useSocket from "@/hooks/useSocket";
 
 type Props = {
@@ -31,7 +32,7 @@ const MainChatArea = ({ currentChatId, currentUserId }: Props) => {
 
     socket.emit("join-chat", currentChatId);
 
-    const handleReceivedMessage = (data: any) => {
+    const handleReceivedMessage = (data: string) => {
       queryClient.setQueryData(
         ["chatMessages", currentChatId],
         (oldData: any) => {
@@ -72,8 +73,11 @@ const MainChatArea = ({ currentChatId, currentUserId }: Props) => {
   };
 
   return (
-    <div className="flex flex-1 flex-col">
-      <div className="flex h-14 items-center border-b px-4 md:px-6">
+    <div className="flex flex-col h-full flex-1">
+      <div
+        id="first_section"
+        className="flex h-14 items-center border-b px-4 md:px-6"
+      >
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8 border">
             <AvatarImage src={chatInfo?.data?.chatInfo.photo} alt="Avatar" />
@@ -86,7 +90,8 @@ const MainChatArea = ({ currentChatId, currentUserId }: Props) => {
           <ChatDropdownMenu chatId={currentChatId} />
         </div>
       </div>
-      <div className="flex-1 overflow-auto p-4 md:p-6">
+
+      <ScrollArea className="p-4 md:p-6 h-[750px]">
         <div className="grid gap-4">
           {chatMessages?.data?.map((message) => (
             <ChatMessage
@@ -98,23 +103,21 @@ const MainChatArea = ({ currentChatId, currentUserId }: Props) => {
             />
           ))}
         </div>
-      </div>
-      <div className="sticky bottom-0 bg-background px-4 py-2 md:px-6">
-        <div className="relative flex items-center gap-2">
-          <Textarea
-            ref={chatInputRef}
-            placeholder="Type your message..."
-            className="h-10 flex-1 resize-none rounded-md border border-input bg-transparent pr-12 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-          />
-          <Button
-            onClick={handleSendMessage}
-            size="icon"
-            className="absolute right-2"
-          >
-            <SendIcon className="h-4 w-4" />
-            <span className="sr-only">Send</span>
-          </Button>
-        </div>
+      </ScrollArea>
+      <div className="flex items-center px-4 py-2 md:px-6 gap-2">
+        <Textarea
+          ref={chatInputRef}
+          placeholder="Type your message..."
+          className="h-10 flex-1 resize-none rounded-md border border-input bg-transparent pr-12 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+        />
+        <Button
+          onClick={handleSendMessage}
+          size="icon"
+          className="absolute right-12"
+        >
+          <SendIcon className="h-4 w-4" />
+          <span className="sr-only">Send</span>
+        </Button>
       </div>
     </div>
   );

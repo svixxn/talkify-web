@@ -67,3 +67,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+.chat-height {
+  height: calc(100% - 200px);
+}

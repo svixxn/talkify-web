@@ -55,7 +55,7 @@ export default function MessengerLayout() {
   return (
     <div className="flex h-screen bg-background/75">
       <aside className="hidden w-1/4 border-r bg-muted/40 md:block">
-        <div className="flex flex-row gap-4 h-14 items-center border-b px-4">
+        <div className="flex flex-row gap-4 py-2 items-center border-b px-4">
           <UserDropdownMenu username={user?.name} />
           <h3 className="text-lg font-semibold">Home</h3>
         </div>

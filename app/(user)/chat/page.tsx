@@ -17,7 +17,7 @@ const ChatPage = () => {
   const { currentChatId } = useChatContext();
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
+    <div className="flex h-screen w-full bg-background">
       <ChatSideMenu
         currentChatId={currentChatId}
         isUserLoading={isUserLoading || false}
@@ -25,7 +25,7 @@ const ChatPage = () => {
       />
 
       {currentChatId ? (
-        <MainChatArea currentChatId={currentChatId} currentUserId={user?.id} />
+        <MainChatArea currentChatId={currentChatId} />
       ) : (
         <div className="px-4 md:px-6 flex items-center justify-center w-3/4">
           {isUserLoading ? (

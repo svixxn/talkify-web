@@ -8,24 +8,34 @@ import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import ChatMessage from "./ChatMessage";
 import ChatDropdownMenu from "./ChatDropdownMenu";
-import { useEffect, useRef } from "react";
+import { FormEvent, useCallback, useEffect, useRef } from "react";
 import { useSocket } from "../shared/SocketProvider";
 import { ChatMessage as ChatMessageType } from "@/types";
 import { useQueryClient } from "react-query";
 import { ScrollArea } from "../ui/scroll-area";
+import { useUserContext } from "../shared/UserContext";
+import MainChatAreaLoader from "./MainChatAreaLoader";
+import { Form } from "../ui/form";
+import { Input } from "../ui/input";
 // import useSocket from "@/hooks/useSocket";
 
 type Props = {
   currentChatId: number;
-  currentUserId: number | undefined;
 };
 
-const MainChatArea = ({ currentChatId, currentUserId }: Props) => {
-  const { data: chatInfo, isLoading } = useFetchChatInfo(currentChatId);
-  const { data: chatMessages } = useFetchChatMessages(currentChatId);
-  const chatInputRef = useRef<HTMLTextAreaElement>(null);
+const MainChatArea = ({ currentChatId }: Props) => {
+  const { data: chatInfo, isLoading: isChatInfoLoading } =
+    useFetchChatInfo(currentChatId);
+  const { data: chatMessages, isLoading: isChatMessagesLoading } =
+    useFetchChatMessages(currentChatId);
+  const { user } = useUserContext();
+  const chatInputRef = useRef<HTMLInputElement>(null);
+  const messagesAreaRef = useRef<HTMLDivElement>(null);
+
   const socket = useSocket();
   const queryClient = useQueryClient();
+
+  const { mutateAsync: sendMessage } = useSendMessage();
 
   useEffect(() => {
     if (!socket) return;
@@ -50,9 +60,24 @@ const MainChatArea = ({ currentChatId, currentUserId }: Props) => {
     };
   }, [socket, currentChatId, queryClient]);
 
-  const { mutateAsync: sendMessage } = useSendMessage();
+  const scrollToBottom = useCallback(() => {
+    if (messagesAreaRef.current) {
+      messagesAreaRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }
+  }, []);
 
-  const handleSendMessage = async () => {
+  useEffect(() => {
+    if (chatMessages?.data) {
+      scrollToBottom();
+    }
+  }, [chatMessages, scrollToBottom]);
+
+  const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     if (!chatInputRef.current || chatInputRef.current?.value.trim() === "")
       return;
 
@@ -66,17 +91,27 @@ const MainChatArea = ({ currentChatId, currentUserId }: Props) => {
       messageType: "text",
     });
 
-    socket?.emit(
-      "chat-message",
-      JSON.stringify(data.data.message as ChatMessageType)
-    );
+    const message = {
+      ...data.data.message,
+      senderAvatar: user?.avatar,
+    } as ChatMessageType;
+
+    socket?.emit("chat-message", JSON.stringify(message));
   };
 
+  if (isChatInfoLoading || isChatMessagesLoading) {
+    return (
+      <div className="flex flex-row items-center justify-center">
+        <MainChatAreaLoader />
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col h-full flex-1">
+    <div className="flex flex-col flex-1">
       <div
         id="first_section"
-        className="flex h-14 items-center border-b px-4 md:px-6"
+        className="flex py-2 items-center border-b px-4 md:px-6"
       >
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8 border">
@@ -91,34 +126,33 @@ const MainChatArea = ({ currentChatId, currentUserId }: Props) => {
         </div>
       </div>
 
-      <ScrollArea className="p-4 md:p-6 h-[750px]">
-        <div className="grid gap-4">
+      <ScrollArea className="p-4">
+        <div ref={messagesAreaRef} className="grid gap-4">
           {chatMessages?.data?.map((message) => (
             <ChatMessage
               key={message.id}
               message={message.content}
-              isCurrentUserSender={currentUserId === message.senderId}
-              avatarFallback="MA"
-              timestamp={new Date()}
+              isCurrentUserSender={user?.id === message.senderId}
+              avatar={message.senderAvatar}
+              timestamp={new Date(message.createdAt)}
             />
           ))}
         </div>
       </ScrollArea>
-      <div className="flex items-center px-4 py-2 md:px-6 gap-2">
-        <Textarea
+      <form
+        onSubmit={handleSendMessage}
+        className="flex items-center px-4 py-2 md:px-6 gap-2"
+      >
+        <Input
           ref={chatInputRef}
           placeholder="Type your message..."
-          className="h-10 flex-1 resize-none rounded-md border border-input bg-transparent pr-12 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-16 flex-1 resize-none rounded-md border border-input bg-transparent pr-20 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
         />
-        <Button
-          onClick={handleSendMessage}
-          size="icon"
-          className="absolute right-12"
-        >
+        <Button type="submit" size="icon" className="absolute right-12">
           <SendIcon className="h-4 w-4" />
           <span className="sr-only">Send</span>
         </Button>
-      </div>
+      </form>
     </div>
   );
 };

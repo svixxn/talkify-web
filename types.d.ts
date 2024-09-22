@@ -17,9 +17,10 @@ export type ChatMessage = {
   id: string;
   createdAt: Date;
   senderId: number;
-  chatId: number;
+  chatId?: number;
   content: string;
   messageType: string;
+  senderAvatar: string;
 };
 
 //Users

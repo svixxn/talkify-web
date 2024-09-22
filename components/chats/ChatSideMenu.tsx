@@ -74,7 +74,7 @@ const ChatSideMenu = ({ user, isUserLoading, currentChatId }: Props) => {
 
   return (
     <div className="hidden w-1/4 border-r bg-muted/40 md:block">
-      <div className="flex flex-row gap-4 h-14 items-center border-b px-4">
+      <div className="flex flex-row gap-4 py-2 items-center border-b px-4">
         <UserDropdownMenu username={user?.name} />
         <h3 className="text-lg font-semibold">Chats</h3>
         <div className="relative ml-auto">

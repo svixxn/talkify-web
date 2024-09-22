@@ -126,7 +126,7 @@ const MainChatArea = ({ currentChatId }: Props) => {
         </div>
       </div>
 
-      <ScrollArea className="p-4">
+      <ScrollArea className="p-4 h-screen">
         <div ref={messagesAreaRef} className="grid gap-4">
           {chatMessages?.data?.map((message) => (
             <ChatMessage

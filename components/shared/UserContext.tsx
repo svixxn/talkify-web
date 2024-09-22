@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import axios, { AxiosResponse } from "axios";
-import { authTokenName } from "@/utils/constants";
+import { API_BASE_URL, authTokenName } from "@/utils/constants";
 import { User } from "@/types";
 
 export type UserContext = {
@@ -40,7 +40,7 @@ export const UserContextProvider = ({
       if (token) {
         try {
           const res: AxiosResponse<FetchUserResponse> = await axios.get(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/me`,
+            `${API_BASE_URL}/users/me`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

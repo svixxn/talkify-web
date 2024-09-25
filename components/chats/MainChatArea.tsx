@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import ChatMessage from "./ChatMessage";
 import ChatDropdownMenu from "./ChatDropdownMenu";
-import { FormEvent, useCallback, useEffect, useRef } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useSocket } from "../shared/SocketProvider";
 import { ChatMessage as ChatMessageType } from "@/types";
 import { useQueryClient } from "react-query";
@@ -17,6 +17,7 @@ import { useUserContext } from "../shared/UserContext";
 import MainChatAreaLoader from "./MainChatAreaLoader";
 import { Form } from "../ui/form";
 import { Input } from "../ui/input";
+import { set } from "zod";
 // import useSocket from "@/hooks/useSocket";
 
 type Props = {
@@ -31,6 +32,8 @@ const MainChatArea = ({ currentChatId }: Props) => {
   const { user } = useUserContext();
   const chatInputRef = useRef<HTMLInputElement>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const [isCurrentUserTyping, setIsCurrentTyping] = useState(false);
 
   const socket = useSocket();
   const queryClient = useQueryClient();
@@ -55,6 +58,14 @@ const MainChatArea = ({ currentChatId }: Props) => {
 
     socket.on("received-message", handleReceivedMessage);
 
+    socket.on("is-typing", () => {
+      setIsTyping(true);
+    });
+
+    socket.on("stopped-typing", () => {
+      setIsTyping(false);
+    });
+
     return () => {
       socket.off("received-message", handleReceivedMessage);
     };
@@ -78,6 +89,10 @@ const MainChatArea = ({ currentChatId }: Props) => {
   const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    socket?.emit("stopped-typing", currentChatId);
+
+    setIsCurrentTyping(false);
+
     if (!chatInputRef.current || chatInputRef.current?.value.trim() === "")
       return;
 
@@ -99,9 +114,29 @@ const MainChatArea = ({ currentChatId }: Props) => {
     socket?.emit("chat-message", JSON.stringify(message));
   };
 
+  const handleInputChange = (e: FormEvent<HTMLInputElement>) => {
+    if (!socket) return;
+
+    if (!isCurrentUserTyping) {
+      socket.emit("is-typing", currentChatId);
+      setIsCurrentTyping(true);
+    }
+
+    let lastTypingTime = new Date().getTime();
+    let timerLength = 3000;
+    setTimeout(() => {
+      let timeNow = new Date().getTime();
+      let timeDiff = timeNow - lastTypingTime;
+      if (timeDiff >= timerLength && isCurrentUserTyping) {
+        socket.emit("stopped-typing", currentChatId);
+        setIsCurrentTyping(false);
+      }
+    }, timerLength);
+  };
+
   if (isChatInfoLoading || isChatMessagesLoading) {
     return (
-      <div className="flex flex-row items-center justify-center">
+      <div className="flex flex-row w-full items-center justify-center">
         <MainChatAreaLoader />
       </div>
     );
@@ -137,6 +172,23 @@ const MainChatArea = ({ currentChatId }: Props) => {
               timestamp={new Date(message.createdAt)}
             />
           ))}
+          {isTyping && (
+            <div className={`flex items-start gap-3`}>
+              <Avatar className="h-10 w-10 border">
+                <AvatarImage
+                  src={chatInfo?.data?.chatInfo.photo}
+                  alt="Avatar"
+                />
+                <AvatarFallback>User</AvatarFallback>
+              </Avatar>
+
+              <div
+                className={`rounded-md flex items-center max-w-72 gap-2 bg-gray-400 text-slate-800 text-sm`}
+              >
+                <p className="py-2 pl-2 break-all">Typing...</p>
+              </div>
+            </div>
+          )}
         </div>
       </ScrollArea>
       <form
@@ -145,6 +197,7 @@ const MainChatArea = ({ currentChatId }: Props) => {
       >
         <Input
           ref={chatInputRef}
+          onChange={handleInputChange}
           placeholder="Type your message..."
           className="h-16 flex-1 resize-none rounded-md border border-input bg-transparent pr-20 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
         />

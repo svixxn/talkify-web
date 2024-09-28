@@ -96,13 +96,28 @@ const MainChatArea = ({ currentChatId }: Props) => {
     if (!chatInputRef.current || chatInputRef.current?.value.trim() === "")
       return;
 
-    const newMessage = chatInputRef.current.value;
+    const newMessageLocal = {
+      id: Date.now(),
+      createdAt: new Date().toISOString(),
+      senderId: user?.id,
+      chatId: currentChatId,
+      content: chatInputRef.current?.value,
+      messageType: "text",
+      senderAvatar: user?.avatar,
+    };
 
-    chatInputRef.current.value = "";
+    queryClient.setQueryData(
+      ["chatMessages", currentChatId],
+      (oldData: any) => {
+        return {
+          data: [...(oldData?.data || []), newMessageLocal],
+        };
+      }
+    );
 
     const data = await sendMessage({
       chatId: currentChatId,
-      content: newMessage,
+      content: chatInputRef.current.value,
       messageType: "text",
     });
 
@@ -112,6 +127,8 @@ const MainChatArea = ({ currentChatId }: Props) => {
     } as ChatMessageType;
 
     socket?.emit("chat-message", JSON.stringify(message));
+
+    chatInputRef.current.value = "";
   };
 
   const handleInputChange = (e: FormEvent<HTMLInputElement>) => {

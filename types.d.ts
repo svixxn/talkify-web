@@ -15,7 +15,7 @@ export type GeneralChatInfo = {
 
 export type ChatMessage = {
   id: string;
-  createdAt: Date;
+  createdAt: string;
   senderId: number;
   chatId?: number;
   content: string;

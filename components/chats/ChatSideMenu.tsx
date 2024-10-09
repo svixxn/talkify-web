@@ -12,6 +12,7 @@ import { useChatContext } from "../shared/ChatContext";
 import { Search } from "lucide-react";
 import { Input } from "../ui/input";
 import { useDebounce } from "@/hooks/useDebounce";
+import { ResizablePanel } from "../ui/resizable";
 
 type Props = {
   user: User | null;
@@ -73,7 +74,12 @@ const ChatSideMenu = ({ user, isUserLoading, currentChatId }: Props) => {
   };
 
   return (
-    <div className="hidden w-1/4 border-r bg-muted/40 md:block">
+    <ResizablePanel
+      defaultSize={25}
+      minSize={15}
+      maxSize={50}
+      className="hidden w-1/4 border-r bg-muted/40 md:block"
+    >
       <div className="flex flex-row gap-4 py-2 items-center border-b px-4">
         <UserDropdownMenu username={user?.name} />
         <h3 className="text-lg font-semibold">Chats</h3>
@@ -91,7 +97,7 @@ const ChatSideMenu = ({ user, isUserLoading, currentChatId }: Props) => {
       <div className="flex-1 overflow-auto">
         <div className="p-4">{getSideMenuContent()}</div>
       </div>
-    </div>
+    </ResizablePanel>
   );
 };
 

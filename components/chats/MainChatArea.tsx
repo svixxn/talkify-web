@@ -155,14 +155,6 @@ const MainChatArea = ({ currentChatId }: Props) => {
     }, timerLength);
   };
 
-  if (isChatInfoLoading || isChatMessagesLoading) {
-    return (
-      <div className="flex flex-row w-full items-center justify-center">
-        <MainChatAreaLoader />
-      </div>
-    );
-  }
-
   return (
     <ResizablePanel defaultSize={75} className="flex flex-col flex-1">
       <div

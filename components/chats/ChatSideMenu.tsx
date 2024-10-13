@@ -6,13 +6,15 @@ import ChatCard from "./ChatCard";
 import ChatItemSkeleton from "./ChatItemSkeleton";
 import { useUserContext } from "../shared/UserContext";
 import UserDropdownMenu from "../shared/UserDropdownMenu";
-import { useEffect, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useChatContext } from "../shared/ChatContext";
 import { Search } from "lucide-react";
 import { Input } from "../ui/input";
 import { useDebounce } from "@/hooks/useDebounce";
 import { ResizablePanel } from "../ui/resizable";
+import { useSocket } from "../shared/SocketProvider";
+import { useQueryClient } from "react-query";
 
 type Props = {
   user: User | null;
@@ -26,8 +28,16 @@ const ChatSideMenu = ({ user, isUserLoading, currentChatId }: Props) => {
   const { setCurrentChatId } = useChatContext();
 
   const debouncedSearchValue = useDebounce(searchValue, 500);
-  const { data: userChats, isLoading: isChatsLoading } =
-    useFetchUserChats(debouncedSearchValue);
+  const {
+    data: userChats,
+    isLoading: isChatsLoading,
+    previousDataLength,
+  } = useFetchUserChats(debouncedSearchValue);
+
+  const hasJoinedChats = useRef(false);
+
+  const socket = useSocket();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (userChats?.error) {
@@ -36,10 +46,54 @@ const ChatSideMenu = ({ user, isUserLoading, currentChatId }: Props) => {
       });
     }
 
-    if (userChats && userChats.data && userChats.data.length > 0) {
-      setCurrentChatId(userChats.data[0].chatId);
+    const handleReceivedMessage = (newChatData: string) => {
+      const parsedData = JSON.parse(newChatData);
+      queryClient.setQueryData(
+        ["chatMessages", parsedData.chatId],
+        (oldData: any) => {
+          return {
+            data: [...(oldData?.data || []), parsedData],
+          };
+        }
+      );
+
+      queryClient.setQueryData(
+        ["chats", { searchValue: "" }],
+        (oldData: any) => {
+          return {
+            data: oldData.data.map((chat: any) => {
+              if (chat.chatId === parsedData.chatId) {
+                return {
+                  ...chat,
+                  lastMessage: parsedData.content,
+                  lastMessageDate: parsedData.createdAt,
+                };
+              }
+              return chat;
+            }),
+          };
+        }
+      );
+    };
+
+    if (userChats && userChats.data && userChats.data.length > 0 && socket) {
+      const chatIds = userChats.data.map(
+        (chat: GeneralChatInfo) => chat.chatId
+      );
+      //TODO: fix re-joining chats on every new message
+      if (!hasJoinedChats.current) {
+        socket.emit("join-chats", chatIds);
+        hasJoinedChats.current = true;
+      }
+
+      socket.on("received-message", handleReceivedMessage);
+
+      return () => {
+        socket.off("received-message", handleReceivedMessage);
+        hasJoinedChats.current = false;
+      };
     }
-  }, [userChats?.data, setCurrentChatId, toast, userChats]);
+  }, [userChats?.data, socket]);
 
   const getSideMenuContent = () => {
     if (isChatsLoading || isUserLoading) {
@@ -75,7 +129,7 @@ const ChatSideMenu = ({ user, isUserLoading, currentChatId }: Props) => {
 
   return (
     <ResizablePanel
-      defaultSize={25}
+      defaultSize={30}
       minSize={15}
       maxSize={50}
       className="hidden w-1/4 border-r bg-muted/40 md:block"

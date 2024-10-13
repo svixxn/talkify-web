@@ -1,26 +1,19 @@
 "use client";
 
-import { useFetchUserChats } from "@/hooks/react-query";
 import ChatSideMenu from "@/components/chats/ChatSideMenu";
 import { useUserContext } from "@/components/shared/UserContext";
-import { useEffect, useState } from "react";
 import { useChatContext } from "@/components/shared/ChatContext";
-import { useToast } from "@/hooks/use-toast";
 import MainChatArea from "@/components/chats/MainChatArea";
-import UserDropdownMenu from "@/components/shared/UserDropdownMenu";
-import ChatItemSkeleton from "@/components/chats/ChatItemSkeleton";
-import { Skeleton } from "@/components/ui/skeleton";
 import MainChatAreaLoader from "@/components/chats/MainChatAreaLoader";
 import {
   ResizableHandle,
-  ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { MessageSquareDiff } from "lucide-react";
 
 const ChatPage = () => {
   const { user, isLoading: isUserLoading } = useUserContext();
   const { currentChatId } = useChatContext();
-
   return (
     <div className="flex h-screen w-full bg-background">
       <ResizablePanelGroup direction="horizontal">
@@ -37,7 +30,15 @@ const ChatPage = () => {
             {isUserLoading ? (
               <MainChatAreaLoader />
             ) : (
-              <span> No chats found </span>
+              <div className="flex flex-col gap-2 items-center">
+                <span className="text-2xl font-semibold">
+                  Choose the chat to start messaging
+                </span>
+                <span className="flex gap-2 items-center">
+                  Or create a new one if you don&apos;t have any
+                  <MessageSquareDiff className="h-6 w-6" />
+                </span>
+              </div>
             )}
           </div>
         )}

@@ -19,6 +19,7 @@ import { Form } from "../ui/form";
 import { Input } from "../ui/input";
 import { set } from "zod";
 import { ResizablePanel } from "../ui/resizable";
+import { useChatContext } from "../shared/ChatContext";
 // import useSocket from "@/hooks/useSocket";
 
 type Props = {
@@ -35,45 +36,12 @@ const MainChatArea = ({ currentChatId }: Props) => {
   const messagesAreaRef = useRef<HTMLDivElement>(null);
   const [isTyping, setIsTyping] = useState(false);
   const [isCurrentUserTyping, setIsCurrentTyping] = useState(false);
+  const { setCurrentChatId } = useChatContext();
 
   const socket = useSocket();
   const queryClient = useQueryClient();
 
   const { mutateAsync: sendMessage } = useSendMessage();
-
-  useEffect(() => {
-    if (!socket) return;
-
-    return () => {
-      socket.emit("leave-chat", currentChatId);
-    };
-  }, [socket, currentChatId]);
-
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.emit("join-chat", currentChatId);
-
-    const handleReceivedMessage = (data: string) => {
-      queryClient.setQueryData(
-        ["chatMessages", currentChatId],
-        (oldData: any) => {
-          return {
-            data: [...(oldData?.data || []), JSON.parse(data)],
-          };
-        }
-      );
-    };
-
-    socket.on("received-message", handleReceivedMessage);
-    socket.on("is-typing", () => setIsTyping(true));
-    socket.on("stopped-typing", () => setIsTyping(false));
-
-    return () => {
-      socket.off("received-message", handleReceivedMessage);
-      socket.emit("leave-chat", currentChatId);
-    };
-  }, [socket, currentChatId, queryClient]);
 
   const scrollToBottom = useCallback(() => {
     if (messagesAreaRef.current) {
@@ -88,7 +56,11 @@ const MainChatArea = ({ currentChatId }: Props) => {
     if (chatMessages?.data) {
       scrollToBottom();
     }
-  }, [chatMessages, scrollToBottom]);
+
+    if (chatMessages?.error) {
+      setCurrentChatId(null);
+    }
+  }, [chatMessages, scrollToBottom, setCurrentChatId]);
 
   const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -118,6 +90,21 @@ const MainChatArea = ({ currentChatId }: Props) => {
         };
       }
     );
+
+    queryClient.setQueryData(["chats", { searchValue: "" }], (oldData: any) => {
+      return {
+        data: oldData.data.map((chat: any) => {
+          if (chat.chatId === currentChatId) {
+            return {
+              ...chat,
+              lastMessage: newMessageLocal.content,
+              lastMessageDate: newMessageLocal.createdAt,
+            };
+          }
+          return chat;
+        }),
+      };
+    });
 
     chatInputRef.current.value = "";
 
@@ -156,7 +143,7 @@ const MainChatArea = ({ currentChatId }: Props) => {
   };
 
   return (
-    <ResizablePanel defaultSize={75} className="flex flex-col flex-1">
+    <ResizablePanel defaultSize={70} className="flex flex-col flex-1">
       <div
         id="first_section"
         className="flex py-2 items-center border-b px-4 md:px-6"

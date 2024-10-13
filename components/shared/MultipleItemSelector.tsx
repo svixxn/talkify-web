@@ -30,8 +30,6 @@ const MultipleItemSelector = ({ value, setValue }: Props) => {
   const [open, setOpen] = useState(false);
   const { data: users } = useSearchUsers("");
 
-  console.log("users", users);
-
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
   const searchUsers = users?.data?.users.filter(

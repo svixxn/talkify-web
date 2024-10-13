@@ -25,6 +25,11 @@ type FetchChatInfoResponse = {
   chatInfo: { name: string; photo: string; participants: ChatParticipant[] };
 };
 
+type CreateChatResponse = {
+  message: string;
+  chatId: number;
+};
+
 type DefaultApiResponse<T> = {
   data?: T;
   error?: any;
@@ -131,7 +136,7 @@ export const searchUsersToCreateChat = async (): Promise<
 
 export const createChat = async (
   data: CreateChat
-): Promise<DefaultApiResponse<any>> => {
+): Promise<DefaultApiResponse<CreateChatResponse>> => {
   try {
     const res = await axios.post(`${API_BASE_URL}/chats`, data, {
       headers: {

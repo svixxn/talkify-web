@@ -29,6 +29,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { useCreateChat } from "@/hooks/react-query";
 import { useToast } from "@/hooks/use-toast";
 import MultipleItemSelector from "../shared/MultipleItemSelector";
+import { useChatContext } from "../shared/ChatContext";
 
 type Props = {
   open: boolean;
@@ -37,6 +38,8 @@ type Props = {
 
 const CreateChatModal = ({ open, setOpen }: Props) => {
   const { toast } = useToast();
+
+  const { setCurrentChatId } = useChatContext();
 
   const form = useForm<CreateChat>({
     resolver: zodResolver(CreateChatSchema),
@@ -48,7 +51,6 @@ const CreateChatModal = ({ open, setOpen }: Props) => {
   const { mutateAsync: createChatAction } = useCreateChat();
 
   const onSubmit: SubmitHandler<CreateChat> = async (data) => {
-    console.log("data", data);
     const res = await createChatAction(data);
 
     if (res.error) {
@@ -65,6 +67,8 @@ const CreateChatModal = ({ open, setOpen }: Props) => {
     form.reset();
 
     setOpen(false);
+
+    if (res.data?.chatId) setCurrentChatId(res.data?.chatId);
   };
 
   return (

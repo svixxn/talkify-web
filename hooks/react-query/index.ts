@@ -22,10 +22,20 @@ export const useRegisterUser = () => {
 };
 
 export const useFetchUserChats = (searchValue: string) => {
-  return useQuery({
-    queryKey: ["chats", { searchValue }],
-    queryFn: () => getUserChats(searchValue),
-  });
+  const queryClient = useQueryClient();
+
+  const previousData: any = queryClient.getQueryData([
+    "chats",
+    { searchValue },
+  ]);
+
+  return {
+    previousDataLength: previousData?.data?.length,
+    ...useQuery({
+      queryKey: ["chats", { searchValue }],
+      queryFn: () => getUserChats(searchValue),
+    }),
+  };
 };
 
 export const useFetchChatInfo = (chatId: number) => {

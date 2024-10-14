@@ -4,6 +4,11 @@ import { SignInSchema, SignUpSchema } from "./utils/validation";
 export type SignUp = z.infer<typeof SignUpSchema>;
 export type SignIn = z.infer<typeof SignInSchema>;
 
+export type DefaultApiResponse<T> = {
+  data?: T;
+  error?: any;
+};
+
 //Chats
 export type GeneralChatInfo = {
   chatId: number;

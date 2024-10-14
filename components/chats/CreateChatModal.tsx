@@ -39,7 +39,7 @@ type Props = {
 const CreateChatModal = ({ open, setOpen }: Props) => {
   const { toast } = useToast();
 
-  const { setCurrentChatId } = useChatContext();
+  const { setCurrentChatId, setHasJoinedChats } = useChatContext();
 
   const form = useForm<CreateChat>({
     resolver: zodResolver(CreateChatSchema),
@@ -68,6 +68,7 @@ const CreateChatModal = ({ open, setOpen }: Props) => {
 
     setOpen(false);
 
+    setHasJoinedChats(false);
     if (res.data?.chatId) setCurrentChatId(res.data?.chatId);
   };
 

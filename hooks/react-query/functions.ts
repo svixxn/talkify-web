@@ -2,6 +2,7 @@ import { CreateChat } from "@/lib/validations";
 import {
   ChatMessage,
   ChatParticipant,
+  DefaultApiResponse,
   GeneralChatInfo,
   SignIn,
   SignUp,
@@ -30,10 +31,6 @@ type CreateChatResponse = {
   chatId: number;
 };
 
-type DefaultApiResponse<T> = {
-  data?: T;
-  error?: any;
-};
 // users
 export const registerUser = async (
   data: Omit<SignUp, "confirmPassword">

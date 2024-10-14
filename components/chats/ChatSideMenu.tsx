@@ -15,85 +15,29 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { ResizablePanel } from "../ui/resizable";
 import { useSocket } from "../shared/SocketProvider";
 import { useQueryClient } from "react-query";
+import { useChatSocketHandler } from "@/hooks/useChatSocketHandler";
 
 type Props = {
   user: User | null;
-  currentChatId: number | null;
   isUserLoading: boolean;
 };
 
-const ChatSideMenu = ({ user, isUserLoading, currentChatId }: Props) => {
+const ChatSideMenu = ({ user, isUserLoading }: Props) => {
   const { toast } = useToast();
   const [searchValue, setSearchValue] = useState("");
-  const { setCurrentChatId } = useChatContext();
+  const [previousDataLength, setPreviousDataLength] = useState(0);
 
   const debouncedSearchValue = useDebounce(searchValue, 500);
-  const {
-    data: userChats,
-    isLoading: isChatsLoading,
+  const { data: userChats, isLoading: isChatsLoading } =
+    useFetchUserChats(debouncedSearchValue);
+
+  const { currentChatId } = useChatContext();
+
+  useChatSocketHandler({
     previousDataLength,
-  } = useFetchUserChats(debouncedSearchValue);
-
-  const hasJoinedChats = useRef(false);
-
-  const socket = useSocket();
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    if (userChats?.error) {
-      toast({
-        title: userChats.error.message,
-      });
-    }
-
-    const handleReceivedMessage = (newChatData: string) => {
-      const parsedData = JSON.parse(newChatData);
-      queryClient.setQueryData(
-        ["chatMessages", parsedData.chatId],
-        (oldData: any) => {
-          return {
-            data: [...(oldData?.data || []), parsedData],
-          };
-        }
-      );
-
-      queryClient.setQueryData(
-        ["chats", { searchValue: "" }],
-        (oldData: any) => {
-          return {
-            data: oldData.data.map((chat: any) => {
-              if (chat.chatId === parsedData.chatId) {
-                return {
-                  ...chat,
-                  lastMessage: parsedData.content,
-                  lastMessageDate: parsedData.createdAt,
-                };
-              }
-              return chat;
-            }),
-          };
-        }
-      );
-    };
-
-    if (userChats && userChats.data && userChats.data.length > 0 && socket) {
-      const chatIds = userChats.data.map(
-        (chat: GeneralChatInfo) => chat.chatId
-      );
-      //TODO: fix re-joining chats on every new message
-      if (!hasJoinedChats.current) {
-        socket.emit("join-chats", chatIds);
-        hasJoinedChats.current = true;
-      }
-
-      socket.on("received-message", handleReceivedMessage);
-
-      return () => {
-        socket.off("received-message", handleReceivedMessage);
-        hasJoinedChats.current = false;
-      };
-    }
-  }, [userChats?.data, socket]);
+    setPreviousDataLength,
+    userChats,
+  });
 
   const getSideMenuContent = () => {
     if (isChatsLoading || isUserLoading) {

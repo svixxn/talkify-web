@@ -34,6 +34,7 @@ import { useState } from "react";
 import { useDeleteChat } from "@/hooks/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useChatContext } from "../shared/ChatContext";
+import { useSocket } from "../shared/SocketProvider";
 
 type Props = {
   chatId: number;
@@ -42,9 +43,10 @@ type Props = {
 const ChatDropdownMenu = ({ chatId }: Props) => {
   const { toast } = useToast();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const { setCurrentChatId } = useChatContext();
+  const { setCurrentChatId, setHasJoinedChats } = useChatContext();
 
   const { mutateAsync: deleteChatAction } = useDeleteChat();
+  const socket = useSocket();
 
   const handleDeleteChat = async () => {
     const res = await deleteChatAction(chatId);
@@ -61,6 +63,9 @@ const ChatDropdownMenu = ({ chatId }: Props) => {
       title: "Chat successfully deleted",
     });
 
+    socket?.emit("delete-chat", chatId);
+
+    setHasJoinedChats(false);
     setCurrentChatId(null);
     setDeleteModalOpen(false);
   };

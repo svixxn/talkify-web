@@ -4,18 +4,15 @@ import { useFetchUserChats } from "@/hooks/react-query";
 import { GeneralChatInfo, User } from "@/types";
 import ChatCard from "./ChatCard";
 import ChatItemSkeleton from "./ChatItemSkeleton";
-import { useUserContext } from "../shared/UserContext";
 import UserDropdownMenu from "../shared/UserDropdownMenu";
-import { use, useEffect, useRef, useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 import { useChatContext } from "../shared/ChatContext";
 import { Search } from "lucide-react";
 import { Input } from "../ui/input";
 import { useDebounce } from "@/hooks/useDebounce";
 import { ResizablePanel } from "../ui/resizable";
-import { useSocket } from "../shared/SocketProvider";
-import { useQueryClient } from "react-query";
 import { useChatSocketHandler } from "@/hooks/useChatSocketHandler";
+import useScreenSize from "@/hooks/useScreenWidth";
 
 type Props = {
   user: User | null;
@@ -23,9 +20,9 @@ type Props = {
 };
 
 const ChatSideMenu = ({ user, isUserLoading }: Props) => {
-  const { toast } = useToast();
   const [searchValue, setSearchValue] = useState("");
   const [previousDataLength, setPreviousDataLength] = useState(0);
+  const { screenSize } = useScreenSize();
 
   const debouncedSearchValue = useDebounce(searchValue, 500);
   const { data: userChats, isLoading: isChatsLoading } =
@@ -73,10 +70,10 @@ const ChatSideMenu = ({ user, isUserLoading }: Props) => {
 
   return (
     <ResizablePanel
-      defaultSize={30}
-      minSize={15}
-      maxSize={50}
-      className="hidden w-1/4 border-r bg-muted/40 md:block"
+      defaultSize={screenSize === "small" && !currentChatId ? 100 : 30}
+      className={`w-full border-r bg-muted/40 ${
+        screenSize === "small" ? "hidden" : "block"
+      }`}
     >
       <div className="flex flex-row gap-4 py-2 items-center border-b px-4">
         <UserDropdownMenu username={user?.name} />

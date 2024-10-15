@@ -5,7 +5,6 @@ import {
 } from "@/hooks/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
-import { Textarea } from "../ui/textarea";
 import ChatMessage from "./ChatMessage";
 import ChatDropdownMenu from "./ChatDropdownMenu";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
@@ -14,19 +13,17 @@ import { ChatMessage as ChatMessageType } from "@/types";
 import { useQueryClient } from "react-query";
 import { ScrollArea } from "../ui/scroll-area";
 import { useUserContext } from "../shared/UserContext";
-import MainChatAreaLoader from "./MainChatAreaLoader";
-import { Form } from "../ui/form";
 import { Input } from "../ui/input";
-import { set } from "zod";
 import { ResizablePanel } from "../ui/resizable";
 import { useChatContext } from "../shared/ChatContext";
-// import useSocket from "@/hooks/useSocket";
+import { ArrowLeftFromLine } from "lucide-react";
 
 type Props = {
   currentChatId: number;
+  screenSize: "small" | "full";
 };
 
-const MainChatArea = ({ currentChatId }: Props) => {
+const MainChatArea = ({ currentChatId, screenSize }: Props) => {
   const { data: chatInfo, isLoading: isChatInfoLoading } =
     useFetchChatInfo(currentChatId);
   const { data: chatMessages, isLoading: isChatMessagesLoading } =
@@ -34,8 +31,8 @@ const MainChatArea = ({ currentChatId }: Props) => {
   const { user } = useUserContext();
   const chatInputRef = useRef<HTMLInputElement>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
-  const [isTyping, setIsTyping] = useState(false);
-  const [isCurrentUserTyping, setIsCurrentTyping] = useState(false);
+  // const [isTyping, setIsTyping] = useState(false);
+  // const [isCurrentUserTyping, setIsCurrentTyping] = useState(false);
   const { setCurrentChatId } = useChatContext();
 
   const socket = useSocket();
@@ -65,9 +62,9 @@ const MainChatArea = ({ currentChatId }: Props) => {
   const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    socket?.emit("stopped-typing", currentChatId);
+    // socket?.emit("stopped-typing", currentChatId);
 
-    setIsCurrentTyping(false);
+    // setIsCurrentTyping(false);
 
     if (!chatInputRef.current || chatInputRef.current?.value.trim() === "")
       return;
@@ -123,23 +120,21 @@ const MainChatArea = ({ currentChatId }: Props) => {
   };
 
   const handleInputChange = () => {
-    if (!socket) return;
-
-    if (!isCurrentUserTyping) {
-      socket.emit("is-typing", currentChatId);
-      setIsCurrentTyping(true);
-    }
-
-    let lastTypingTime = new Date().getTime();
-    let timerLength = 3000;
-    setTimeout(() => {
-      let timeNow = new Date().getTime();
-      let timeDiff = timeNow - lastTypingTime;
-      if (timeDiff >= timerLength && isCurrentUserTyping) {
-        socket.emit("stopped-typing", currentChatId);
-        setIsCurrentTyping(false);
-      }
-    }, timerLength);
+    // if (!socket) return;
+    // if (!isCurrentUserTyping) {
+    //   socket.emit("is-typing", currentChatId);
+    //   setIsCurrentTyping(true);
+    // }
+    // let lastTypingTime = new Date().getTime();
+    // let timerLength = 3000;
+    // setTimeout(() => {
+    //   let timeNow = new Date().getTime();
+    //   let timeDiff = timeNow - lastTypingTime;
+    //   if (timeDiff >= timerLength && isCurrentUserTyping) {
+    //     socket.emit("stopped-typing", currentChatId);
+    //     setIsCurrentTyping(false);
+    //   }
+    // }, timerLength);
   };
 
   return (
@@ -149,6 +144,17 @@ const MainChatArea = ({ currentChatId }: Props) => {
         className="flex py-2 items-center border-b px-4 md:px-6"
       >
         <div className="flex items-center gap-3">
+          {screenSize === "small" && (
+            <Button
+              size="icon"
+              className="bg-transparent"
+              onClick={() => {
+                setCurrentChatId(null);
+              }}
+            >
+              <ArrowLeftFromLine className="text-white hover:text-background" />
+            </Button>
+          )}
           <Avatar className="h-8 w-8 border">
             <AvatarImage src={chatInfo?.data?.chatInfo.photo} alt="Avatar" />
             <AvatarFallback>AC</AvatarFallback>
@@ -172,7 +178,7 @@ const MainChatArea = ({ currentChatId }: Props) => {
               timestamp={new Date(message.createdAt)}
             />
           ))}
-          {isTyping && (
+          {/* {isTyping && (
             <div className={`flex items-start gap-3`}>
               <Avatar className="h-10 w-10 border">
                 <AvatarImage
@@ -188,7 +194,7 @@ const MainChatArea = ({ currentChatId }: Props) => {
                 <p className="py-2 pl-2 break-all">Typing...</p>
               </div>
             </div>
-          )}
+          )} */}
         </div>
       </ScrollArea>
       <form

@@ -4,6 +4,7 @@ import { useQueryClient } from "react-query";
 import { useToast } from "./use-toast";
 import { DefaultApiResponse, GeneralChatInfo } from "@/types";
 import { useChatContext } from "@/components/shared/ChatContext";
+import useScreenSize from "./useScreenWidth";
 
 type UseChatSocketHandlerProps = {
   previousDataLength: number;
@@ -19,6 +20,7 @@ export const useChatSocketHandler = ({
   const { toast } = useToast();
   const socket = useSocket();
   const queryClient = useQueryClient();
+  const { screenSize, setScreenSize } = useScreenSize();
 
   const { hasJoinedChats, setHasJoinedChats, currentChatId, setCurrentChatId } =
     useChatContext();

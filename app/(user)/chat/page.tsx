@@ -11,11 +11,12 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { MessageSquareDiff } from "lucide-react";
-import { useEffect } from "react";
+import useScreenSize from "@/hooks/useScreenWidth";
 
 const ChatPage = () => {
   const { user, isLoading: isUserLoading } = useUserContext();
   const { currentChatId } = useChatContext();
+  const { screenSize } = useScreenSize();
 
   return (
     <div className="flex h-screen w-full bg-background">
@@ -23,11 +24,11 @@ const ChatPage = () => {
         <ChatSideMenu isUserLoading={isUserLoading || false} user={user} />
         <ResizableHandle />
         {currentChatId ? (
-          <MainChatArea currentChatId={currentChatId} />
+          <MainChatArea currentChatId={currentChatId} screenSize={screenSize} />
         ) : (
           <ResizablePanel
             defaultSize={70}
-            className="px-4 md:px-6 flex items-center justify-center w-3/4"
+            className="px-4 hidden md:flex md:px-6 items-center justify-center"
           >
             {isUserLoading ? (
               <MainChatAreaLoader />

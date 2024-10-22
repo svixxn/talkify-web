@@ -17,6 +17,8 @@ import { Input } from "../ui/input";
 import { ResizablePanel } from "../ui/resizable";
 import { useChatContext } from "../shared/ChatContext";
 import { ArrowLeftFromLine } from "lucide-react";
+import MainChatAreaLoader from "./MainChatAreaLoader";
+import { updateMessagesStatus } from "@/lib/chats/helpers";
 
 type Props = {
   currentChatId: number;
@@ -31,8 +33,6 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
   const { user } = useUserContext();
   const chatInputRef = useRef<HTMLInputElement>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
-  // const [isTyping, setIsTyping] = useState(false);
-  // const [isCurrentUserTyping, setIsCurrentTyping] = useState(false);
   const { setCurrentChatId } = useChatContext();
 
   const socket = useSocket();
@@ -62,16 +62,17 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
   const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // socket?.emit("stopped-typing", currentChatId);
-
-    // setIsCurrentTyping(false);
-
-    if (!chatInputRef.current || chatInputRef.current?.value.trim() === "")
+    if (
+      !chatInputRef.current ||
+      chatInputRef.current?.value.trim() === "" ||
+      !socket
+    )
       return;
 
     const newMessageLocal = {
       id: Date.now(),
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       senderId: user?.id,
       chatId: currentChatId,
       content: chatInputRef.current?.value,
@@ -79,66 +80,37 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
       senderAvatar: user?.avatar,
     };
 
-    queryClient.setQueryData(
-      ["chatMessages", currentChatId],
-      (oldData: any) => {
-        return {
-          data: [...(oldData?.data || []), newMessageLocal],
-        };
-      }
-    );
+    updateMessagesStatus(queryClient, currentChatId, newMessageLocal);
 
-    queryClient.setQueryData(["chats", { searchValue: "" }], (oldData: any) => {
-      return {
-        data: oldData.data.map((chat: any) => {
-          if (chat.chatId === currentChatId) {
-            return {
-              ...chat,
-              lastMessage: newMessageLocal.content,
-              lastMessageDate: newMessageLocal.createdAt,
-            };
-          }
-          return chat;
-        }),
-      };
-    });
+    socket.emit("chat-message", JSON.stringify(newMessageLocal));
 
     chatInputRef.current.value = "";
 
-    const data = await sendMessage({
+    await sendMessage({
       chatId: currentChatId,
       content: newMessageLocal.content,
       messageType: "text",
     });
-
-    const message = {
-      ...data.data.message,
-      senderAvatar: user?.avatar,
-    } as ChatMessageType;
-
-    socket?.emit("chat-message", JSON.stringify(message));
   };
 
-  const handleInputChange = () => {
-    // if (!socket) return;
-    // if (!isCurrentUserTyping) {
-    //   socket.emit("is-typing", currentChatId);
-    //   setIsCurrentTyping(true);
-    // }
-    // let lastTypingTime = new Date().getTime();
-    // let timerLength = 3000;
-    // setTimeout(() => {
-    //   let timeNow = new Date().getTime();
-    //   let timeDiff = timeNow - lastTypingTime;
-    //   if (timeDiff >= timerLength && isCurrentUserTyping) {
-    //     socket.emit("stopped-typing", currentChatId);
-    //     setIsCurrentTyping(false);
-    //   }
-    // }, timerLength);
-  };
+  if (isChatInfoLoading || isChatMessagesLoading) {
+    return (
+      <ResizablePanel
+        defaultSize={70}
+        className="flex flex-col items-center justify-center flex-1"
+      >
+        <MainChatAreaLoader />
+      </ResizablePanel>
+    );
+  }
 
   return (
-    <ResizablePanel defaultSize={70} className="flex flex-col flex-1">
+    <ResizablePanel
+      defaultSize={70}
+      maxSize={80}
+      minSize={40}
+      className="flex flex-col flex-1"
+    >
       <div
         id="first_section"
         className="flex py-2 items-center border-b px-4 md:px-6"
@@ -178,23 +150,6 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
               timestamp={new Date(message.createdAt)}
             />
           ))}
-          {/* {isTyping && (
-            <div className={`flex items-start gap-3`}>
-              <Avatar className="h-10 w-10 border">
-                <AvatarImage
-                  src={chatInfo?.data?.chatInfo.photo}
-                  alt="Avatar"
-                />
-                <AvatarFallback>User</AvatarFallback>
-              </Avatar>
-
-              <div
-                className={`rounded-md flex items-center max-w-72 gap-2 bg-gray-400 text-slate-800 text-sm`}
-              >
-                <p className="py-2 pl-2 break-all">Typing...</p>
-              </div>
-            </div>
-          )} */}
         </div>
       </ScrollArea>
       <form
@@ -203,7 +158,6 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
       >
         <Input
           ref={chatInputRef}
-          onChange={handleInputChange}
           placeholder="Type your message..."
           className="h-16 flex-1 resize-none rounded-md border border-input bg-transparent pr-20 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
         />

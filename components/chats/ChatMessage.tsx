@@ -26,14 +26,14 @@ const ChatMessage = ({
       )}
 
       <div
-        className={`rounded-md flex items-center max-w-72 gap-2 ${
+        className={`rounded-2xl flex items-center max-w-72 gap-2 ${
           isCurrentUserSender
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted/50"
+            ? "message-own text-primary-foreground rounded-br-sm"
+            : "message-system text-primary rounded-bl-sm"
         } text-sm`}
       >
-        <p className="py-2 pl-2 break-all">{message}</p>
-        <span className="text-[10px] opacity-80 mt-auto p-1">
+        <p className="pl-2 py-2 break-all">{message}</p>
+        <span className="text-[10px] opacity-80 mt-auto p-1 pr-2">
           {timestamp.getHours() + ":" + timestamp.getMinutes()}
         </span>
       </div>

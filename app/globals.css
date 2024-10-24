@@ -32,25 +32,35 @@
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
+
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20.2% 65.1%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
+
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+    --ring: 216 34% 17%;
+
+    --radius: 0.75rem;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -64,7 +74,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen text-foreground;
   }
 }
 
@@ -72,40 +82,38 @@
   height: calc(100% - 200px);
 }
 
-.typing {
-  position: relative;
+.messages-container {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(216 34% 17%) transparent;
 }
 
-.typing span {
-  animation: blink 1.5s infinite;
-  animation-fill-mode: both;
-  height: 10px;
-  width: 10px;
-  background: #3b5998;
-  position: absolute;
-  left: 0;
-  top: 0;
-  border-radius: 50%;
+.messages-container::-webkit-scrollbar {
+  width: 6px;
 }
 
-.typing span:nth-child(2) {
-  animation-delay: 0.2s;
-  margin-left: calc(10px * 1.5);
+.messages-container::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.typing span:nth-child(3) {
-  animation-delay: 0.4s;
-  margin-left: calc(10px * 3);
+.messages-container::-webkit-scrollbar-thumb {
+  background-color: hsl(216 34% 17%);
+  border-radius: 20px;
 }
 
-@keyframes blink {
-  0% {
-    opacity: 0.1;
-  }
-  20% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.1;
-  }
+.message-own {
+  background: linear-gradient(
+    135deg,
+    hsl(213 31% 91%) 0%,
+    hsl(213 31% 96%) 100%
+  );
+  box-shadow: 0 2px 8px -2px rgba(255, 255, 255, 0.1);
+}
+
+.message-system {
+  background: linear-gradient(
+    135deg,
+    hsl(216 34% 17%) 0%,
+    hsl(216 34% 20%) 100%
+  );
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.2);
 }

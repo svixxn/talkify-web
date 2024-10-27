@@ -28,8 +28,8 @@ const ChatCard = ({
     <button
       onClick={() => setCurrentChatId(id)}
       className={`flex items-center text-left gap-3 rounded-md ${
-        isActive ? "bg-muted hover:bg-muted/75" : "bg-muted/30 hover:bg-muted"
-      } px-3 py-2 text-sm font-medium transition-colors`}
+        isActive ? "bg-muted/75 hover:bg-muted/50" : "hover:bg-muted/50"
+      } px-3 py-2 text-sm font-medium transition`}
     >
       <Avatar className="h-8 w-8 border">
         <AvatarImage src={profilePictureSrc} alt="Avatar" />

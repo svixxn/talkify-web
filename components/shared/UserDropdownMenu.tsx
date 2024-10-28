@@ -36,8 +36,8 @@ const UserDropdownMenu = ({ username }: Props) => {
   const pathname = usePathname();
 
   const handleLogOut = async () => {
-    const res = await axios.delete("/api/login");
-    router.replace("/signin");
+    await axios.delete("/api/login");
+    router.replace("/");
   };
 
   return (

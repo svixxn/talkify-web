@@ -71,7 +71,9 @@ const ChatSideMenu = ({ user, isUserLoading }: Props) => {
   return (
     <ResizablePanel
       defaultSize={screenSize === "small" && !currentChatId ? 100 : 30}
-      className={`w-full border-r bg-muted/40 ${
+      minSize={30}
+      maxSize={70}
+      className={`w-full rounded-l-xl border backdrop-blur-sm shadow-2xl bg-muted/40 ${
         screenSize === "small" ? "hidden" : "block"
       }`}
     >

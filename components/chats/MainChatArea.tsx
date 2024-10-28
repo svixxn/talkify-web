@@ -16,9 +16,11 @@ import { useUserContext } from "../shared/UserContext";
 import { Input } from "../ui/input";
 import { ResizablePanel } from "../ui/resizable";
 import { useChatContext } from "../shared/ChatContext";
-import { ArrowLeftFromLine } from "lucide-react";
+import { ArrowLeftFromLine, Sparkles, Users } from "lucide-react";
 import MainChatAreaLoader from "./MainChatAreaLoader";
 import { updateMessagesStatus } from "@/lib/chats/helpers";
+import { cn } from "@/lib/utils";
+import ChatEmptyState from "../shared/ChatEmptyState";
 
 type Props = {
   currentChatId: number;
@@ -69,10 +71,14 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
     )
       return;
 
+    const localOffset = new Date().getTimezoneOffset() * 60000;
+
+    const nowWithOffset = new Date(Date.now() - localOffset);
+
     const newMessageLocal = {
       id: Date.now(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: nowWithOffset.toISOString(),
+      updatedAt: nowWithOffset.toISOString(),
       senderId: user?.id,
       chatId: currentChatId,
       content: chatInputRef.current?.value,
@@ -107,9 +113,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
   return (
     <ResizablePanel
       defaultSize={70}
-      maxSize={80}
-      minSize={40}
-      className="flex flex-col flex-1"
+      className="flex flex-col backdrop-blur-sm shadow-2xl flex-1 md:border md:rounded-r-xl"
     >
       <div
         id="first_section"
@@ -139,22 +143,30 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
         </div>
       </div>
 
-      <ScrollArea className="p-4 h-screen">
-        <div
-          ref={messagesAreaRef}
-          className="grid gap-4 backdrop-blur-sm shadow-2xl"
-        >
-          {chatMessages?.data?.map((message) => (
-            <ChatMessage
-              key={message.id}
-              message={message.content}
-              isCurrentUserSender={user?.id === message.senderId}
-              avatar={message.senderAvatar}
-              timestamp={new Date(message.createdAt)}
-            />
-          ))}
-        </div>
-      </ScrollArea>
+      {chatMessages?.data?.length === 0 ? (
+        <ChatEmptyState
+          title="No messages yet"
+          icon={<Sparkles className="w-10 h-10 animate-pulse" />}
+          description="Start the conversation by sending the first message"
+        />
+      ) : (
+        <ScrollArea className="p-4 h-screen">
+          <div
+            ref={messagesAreaRef}
+            className="grid gap-4 backdrop-blur-sm shadow-2xl"
+          >
+            {chatMessages?.data?.map((message) => (
+              <ChatMessage
+                key={message.id}
+                message={message.content}
+                isCurrentUserSender={user?.id === message.senderId}
+                avatar={message.senderAvatar}
+                timestamp={new Date(message.createdAt)}
+              />
+            ))}
+          </div>
+        </ScrollArea>
+      )}
       <form
         onSubmit={handleSendMessage}
         className="flex items-center px-4 py-2 md:px-6 gap-2"
@@ -162,7 +174,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
         <Input
           ref={chatInputRef}
           placeholder="Type your message..."
-          className="h-16 flex-1 resize-none rounded-md border border-input bg-transparent pr-20 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-16 flex-1 resize-none rounded-md border border-input pr-20 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
         />
         <Button type="submit" size="icon" className="absolute right-12">
           <SendIcon className="h-4 w-4" />

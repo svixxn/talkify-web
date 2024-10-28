@@ -1,10 +1,10 @@
+import AuthModal from "@/components/auth/AuthModal";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, Shield, Zap, Globe2 } from "lucide-react";
 
 const LandingPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
-      {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
         <nav className="flex justify-between items-center py-6">
           <div className="flex items-center space-x-2">
@@ -31,14 +31,7 @@ const LandingPage = () => {
               About
             </a>
           </div>
-          <div className="flex space-x-4">
-            <Button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white transition">
-              Login
-            </Button>
-            <Button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition">
-              Sign Up
-            </Button>
-          </div>
+          <AuthModal />
         </nav>
 
         <div className="text-center mt-24">
@@ -101,14 +94,13 @@ const LandingPage = () => {
         </div>
       </div>
 
-      {/* Social Proof */}
       <div className="border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <p className="text-gray-400 mb-8">
               Trusted by leading companies worldwide
             </p>
-            <div className="flex justify-center items-center space-x-12 opacity-50">
+            <div className="flex flex-col gap-4 md:flex-row justify-center items-center md:space-x-12 opacity-50">
               <div className="text-white font-bold text-xl">Talko Ltd.</div>
               <div className="text-white font-bold text-xl">Mankivskyi.io</div>
               <div className="text-white font-bold text-xl">

@@ -5,6 +5,7 @@ import { useToast } from "./use-toast";
 import { DefaultApiResponse, GeneralChatInfo } from "@/types";
 import { useChatContext } from "@/components/shared/ChatContext";
 import useScreenSize from "./useScreenWidth";
+import { updateMessagesStatus } from "@/lib/chats/helpers";
 
 type UseChatSocketHandlerProps = {
   previousDataLength: number;
@@ -29,33 +30,7 @@ export const useChatSocketHandler = ({
     if (socket) {
       const handleReceivedMessage = (newChatData: string) => {
         const parsedData = JSON.parse(newChatData);
-
-        queryClient.setQueryData(
-          ["chatMessages", parsedData.chatId],
-          (oldData: any) => {
-            return {
-              data: [...(oldData?.data || []), parsedData],
-            };
-          }
-        );
-
-        queryClient.setQueryData(
-          ["chats", { searchValue: "" }],
-          (oldData: any) => {
-            return {
-              data: oldData.data.map((chat: any) => {
-                if (chat.chatId === parsedData.chatId) {
-                  return {
-                    ...chat,
-                    lastMessage: parsedData.content,
-                    lastMessageDate: parsedData.createdAt,
-                  };
-                }
-                return chat;
-              }),
-            };
-          }
-        );
+        updateMessagesStatus(queryClient, parsedData.chatId, parsedData);
       };
 
       const handleDeletedChat = (chatId: number) => {

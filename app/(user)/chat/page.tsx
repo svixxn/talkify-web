@@ -10,8 +10,9 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { MessageSquareDiff } from "lucide-react";
+import { MessageSquareDiff, MessagesSquare } from "lucide-react";
 import useScreenSize from "@/hooks/useScreenWidth";
+import ChatEmptyState from "@/components/shared/ChatEmptyState";
 
 const ChatPage = () => {
   const { user, isLoading: isUserLoading } = useUserContext();
@@ -19,29 +20,25 @@ const ChatPage = () => {
   const { screenSize } = useScreenSize();
 
   return (
-    <div className="flex h-screen w-full bg-background">
+    <div className="flex md:p-4 h-screen w-full bg-background">
       <ResizablePanelGroup direction="horizontal">
         <ChatSideMenu isUserLoading={isUserLoading || false} user={user} />
-        <ResizableHandle />
+        <ResizableHandle className="md:mr-4" />
         {currentChatId ? (
           <MainChatArea currentChatId={currentChatId} screenSize={screenSize} />
         ) : (
           <ResizablePanel
             defaultSize={70}
-            className="px-4 hidden md:flex md:px-6 items-center justify-center"
+            className="px-4 hidden md:flex md:px-6 items-center justify-center rounded-xl"
           >
             {isUserLoading ? (
               <MainChatAreaLoader />
             ) : (
-              <div className="flex flex-col gap-2 items-center">
-                <span className="text-2xl font-semibold">
-                  Choose the chat to start messaging
-                </span>
-                <span className="flex gap-2 items-center">
-                  Or create a new one if you don&apos;t have any
-                  <MessageSquareDiff className="h-6 w-6" />
-                </span>
-              </div>
+              <ChatEmptyState
+                title="Start a conversation"
+                icon={<MessagesSquare className="w-10 h-10 animate-pulse" />}
+                description="Select a chat to start messaging or create a new chat if you don't have any."
+              />
             )}
           </ResizablePanel>
         )}

@@ -10,6 +10,6 @@ export function middleware(request: NextRequest) {
   if (tokenCookie && tokenCookie.value && tokenCookie.value !== "deleted") {
     return NextResponse.next();
   } else {
-    return NextResponse.redirect(new URL("/signin", request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
 }

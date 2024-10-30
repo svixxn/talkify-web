@@ -29,24 +29,13 @@ import UserDropdownMenu from "@/components/shared/UserDropdownMenu";
 import { useUserContext } from "@/components/shared/UserContext";
 
 export default function MessengerLayout() {
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState("profile");
   const { user } = useUserContext();
-
-  const contacts = [
-    { id: 1, name: "Alice Smith", status: "online" },
-    { id: 2, name: "Bob Johnson", status: "offline" },
-    { id: 3, name: "Charlie Brown", status: "away" },
-    { id: 4, name: "Diana Prince", status: "online" },
-    { id: 5, name: "Ethan Hunt", status: "offline" },
-  ];
 
   const renderContent = () => {
     switch (activeTab) {
       case "profile":
         return <ProfileContent />;
-      case "contacts":
-        return <ContactsContent contacts={contacts} />;
       default:
         return <div>Content for {activeTab}</div>;
     }
@@ -168,29 +157,6 @@ function ProfileContent() {
           Logout
         </Button>
       </div>
-    </div>
-  );
-}
-
-function ContactsContent({ contacts }: { contacts: any[] }) {
-  return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Contacts</h2>
-      <ScrollArea className="h-[400px] pr-4">
-        {contacts.map((contact) => (
-          <div key={contact.id} className="flex items-center space-x-4 mb-4">
-            <Avatar>
-              <AvatarFallback>{contact.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-medium">{contact.name}</p>
-              <p className="text-sm text-muted-foreground capitalize">
-                {contact.status}
-              </p>
-            </div>
-          </div>
-        ))}
-      </ScrollArea>
     </div>
   );
 }

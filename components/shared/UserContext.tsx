@@ -7,7 +7,7 @@ import { User } from "@/types";
 
 export type UserContext = {
   user: User | null;
-  setUser: (prev: User | null | ((prev: User | null) => any)) => void;
+  setUser: (user: User | null) => void;
   isLoading?: boolean;
 };
 
@@ -31,7 +31,7 @@ export const UserContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [user, setUser] = useState<any>();
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

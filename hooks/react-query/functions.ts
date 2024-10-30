@@ -23,7 +23,13 @@ type FetchChatsResponse = {
 
 type FetchChatInfoResponse = {
   message: string;
-  chatInfo: { name: string; photo: string; participants: ChatParticipant[] };
+  chatInfo: {
+    name: string;
+    photo: string;
+    isGroup: boolean;
+    description: string;
+  };
+  participants: ChatParticipant[];
 };
 
 type CreateChatResponse = {

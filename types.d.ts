@@ -46,4 +46,5 @@ export type ChatParticipant = {
   name: string;
   email: string;
   avatar: string | null;
+  role: "admin" | "moderator" | "user";
 };

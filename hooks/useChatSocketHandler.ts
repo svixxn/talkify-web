@@ -21,7 +21,6 @@ export const useChatSocketHandler = ({
   const { toast } = useToast();
   const socket = useSocket();
   const queryClient = useQueryClient();
-  const { screenSize, setScreenSize } = useScreenSize();
 
   const { hasJoinedChats, setHasJoinedChats, currentChatId, setCurrentChatId } =
     useChatContext();

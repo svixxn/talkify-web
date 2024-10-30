@@ -19,8 +19,10 @@ import { useChatContext } from "../shared/ChatContext";
 import { ArrowLeftFromLine, Sparkles, Users } from "lucide-react";
 import MainChatAreaLoader from "./MainChatAreaLoader";
 import { updateMessagesStatus } from "@/lib/chats/helpers";
-import { cn } from "@/lib/utils";
+import { cn, convertDateWithoutOffset } from "@/lib/utils";
 import ChatEmptyState from "../shared/ChatEmptyState";
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
+import ChatInfoModal from "./ChatInfoModal";
 
 type Props = {
   currentChatId: number;
@@ -45,7 +47,6 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
   const scrollToBottom = useCallback(() => {
     if (messagesAreaRef.current) {
       messagesAreaRef.current.scrollIntoView({
-        behavior: "smooth",
         block: "end",
       });
     }
@@ -71,9 +72,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
     )
       return;
 
-    const localOffset = new Date().getTimezoneOffset() * 60000;
-
-    const nowWithOffset = new Date(Date.now() - localOffset);
+    const nowWithOffset = convertDateWithoutOffset(new Date());
 
     const newMessageLocal = {
       id: Date.now(),
@@ -131,11 +130,30 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
               <ArrowLeftFromLine className="text-white hover:text-background" />
             </Button>
           )}
-          <Avatar className="h-8 w-8 border">
-            <AvatarImage src={chatInfo?.data?.chatInfo.photo} alt="Avatar" />
-            <AvatarFallback>AC</AvatarFallback>
-          </Avatar>
-          <div className="font-medium">{chatInfo?.data?.chatInfo.name}</div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <button className="flex items-center gap-3 hover:opacity-80">
+                <Avatar className="h-8 w-8 border">
+                  <AvatarImage
+                    src={chatInfo?.data?.chatInfo.photo}
+                    alt="Avatar"
+                  />
+                  <AvatarFallback>AC</AvatarFallback>
+                </Avatar>
+                <div className="font-medium">
+                  {chatInfo?.data?.chatInfo.name}
+                </div>
+              </button>
+            </DialogTrigger>
+            <ChatInfoModal
+              id={currentChatId}
+              name={chatInfo?.data?.chatInfo.name}
+              photo={chatInfo?.data?.chatInfo.photo}
+              participants={chatInfo?.data?.participants}
+              description={chatInfo?.data?.chatInfo.description}
+              isGroup={chatInfo?.data?.chatInfo.isGroup}
+            />
+          </Dialog>
         </div>
 
         <div className="ml-auto">

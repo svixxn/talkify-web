@@ -1,8 +1,13 @@
 import { z } from "zod";
-import { SignInSchema, SignUpSchema } from "./utils/validation";
+import {
+  SignInSchema,
+  SignUpSchema,
+  UpdateChatSchema,
+} from "./lib/validations";
 
 export type SignUp = z.infer<typeof SignUpSchema>;
 export type SignIn = z.infer<typeof SignInSchema>;
+export type UpdateChat = z.infer<typeof UpdateChatSchema>;
 
 export type DefaultApiResponse<T> = {
   data?: T;

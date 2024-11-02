@@ -169,10 +169,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
         />
       ) : (
         <ScrollArea className="p-4 h-screen">
-          <div
-            ref={messagesAreaRef}
-            className="grid gap-4 backdrop-blur-sm shadow-2xl"
-          >
+          <div ref={messagesAreaRef} className="grid gap-4">
             {chatMessages?.data?.map((message) => (
               <ChatMessage
                 key={message.id}

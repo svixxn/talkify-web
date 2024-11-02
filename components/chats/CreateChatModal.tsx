@@ -30,6 +30,7 @@ import { useCreateChat } from "@/hooks/react-query";
 import { useToast } from "@/hooks/use-toast";
 import MultipleItemSelector from "../shared/MultipleItemSelector";
 import { useChatContext } from "../shared/ChatContext";
+import CustomDialogContent from "../shared/CustomDialogContent";
 
 type Props = {
   open: boolean;
@@ -73,7 +74,7 @@ const CreateChatModal = ({ open, setOpen }: Props) => {
   };
 
   return (
-    <DialogContent className="sm:max-w-[425px]">
+    <CustomDialogContent className="max-w-[425px]">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -172,7 +173,7 @@ const CreateChatModal = ({ open, setOpen }: Props) => {
           )}
         </form>
       </Form>
-    </DialogContent>
+    </CustomDialogContent>
   );
 };
 

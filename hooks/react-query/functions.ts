@@ -37,6 +37,11 @@ type CreateChatResponse = {
   chatId: number;
 };
 
+type UpdateChatResponse = {
+  message: string;
+  updatedChat: any;
+};
+
 // users
 export const registerUser = async (
   data: Omit<SignUp, "confirmPassword">
@@ -208,6 +213,32 @@ export const getChatMessages = async (
     });
 
     return { data: res.data.messages };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { error: error.response?.data };
+  }
+};
+
+export const updateChat = async (data: {
+  name?: string;
+  description?: string;
+  chatId: number;
+}): Promise<DefaultApiResponse<UpdateChatResponse>> => {
+  try {
+    const res = await axios.patch(
+      `${API_BASE_URL}/chats/${data.chatId}`,
+      {
+        name: data.name,
+        description: data.description,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + getCookie(authTokenName),
+        },
+      }
+    );
+
+    return { data: res.data };
   } catch (err) {
     const error = err as AxiosError;
     return { error: error.response?.data };

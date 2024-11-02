@@ -44,3 +44,8 @@ export const SignInSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
 });
+
+export const UpdateChatSchema = z.object({
+  name: z.string().min(4).max(52).optional(),
+  description: z.string().optional(),
+});

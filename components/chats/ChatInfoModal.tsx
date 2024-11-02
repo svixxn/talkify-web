@@ -1,10 +1,25 @@
 import { ChatParticipant } from "@/types";
-import { DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Circle, MessagesSquare, Users } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import {
+  Circle,
+  MessagesSquare,
+  Settings2,
+  UserPlus,
+  Users,
+} from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarImage } from "../ui/avatar";
-import { AvatarFallback } from "@radix-ui/react-avatar";
+import { AvatarFallback } from "../ui/avatar";
+import { Button } from "../ui/button";
+import ChatSettingsModal from "./ChatSettingsModal";
+import CustomDialogContent from "../shared/CustomDialogContent";
 
 type Props = {
   id: number;
@@ -24,18 +39,32 @@ const ChatInfoModal = ({
   participants,
 }: Props) => {
   return (
-    <DialogContent className="bg-accent/20 backdrop-blur-sm border-accent">
+    <CustomDialogContent>
       <DialogHeader>
-        <div className="flex items-center gap-4 mb-4">
-          <Avatar className="h-16 w-16 border">
-            <AvatarImage src={photo} alt="Avatar" />
-            <AvatarFallback>TLK</AvatarFallback>
-          </Avatar>
-          <div>
-            <DialogTitle className="text-xl font-semibold text-primary">
-              {name}
-            </DialogTitle>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-accent">
+              <MessagesSquare className="w-8 h-8 text-accent-foreground" />
+            </div>
+            <div>
+              <DialogTitle className="text-xl font-semibold text-primary">
+                {name}
+              </DialogTitle>
+            </div>
           </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Settings2 className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <ChatSettingsModal
+              id={id}
+              name={name}
+              description={description}
+              image={photo}
+            />
+          </Dialog>
         </div>
       </DialogHeader>
 
@@ -50,13 +79,25 @@ const ChatInfoModal = ({
         {/* Members */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-primary">Members</h3>
             <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
+              <h3 className="text-sm font-medium text-primary">Members</h3>
+              <span className="text-xs text-muted-foreground">
                 {participants?.length}
               </span>
             </div>
+            {/* <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <UserPlus className="w-4 h-4" />
+                  Add Member
+                </Button>
+              </DialogTrigger>
+              <ChatSettingsModal
+                id={id}
+                name={name}
+                description={description}
+              />
+            </Dialog> */}
           </div>
 
           <ScrollArea className="h-[200px] pr-4">
@@ -95,7 +136,7 @@ const ChatInfoModal = ({
           </ScrollArea>
         </div>
       </div>
-    </DialogContent>
+    </CustomDialogContent>
   );
 };
 

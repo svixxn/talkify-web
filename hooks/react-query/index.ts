@@ -10,6 +10,7 @@ import {
   searchUsers,
   searchUsersToCreateChat,
   sendChatMessage,
+  updateChat,
 } from "./functions";
 import { GeneralChatInfo, SignIn, SignUp } from "@/types";
 import { CreateChat } from "@/lib/validations";
@@ -88,5 +89,22 @@ export const useSendMessage = () => {
       messageType: string;
       chatId: number;
     }) => sendChatMessage(data),
+  });
+};
+
+export const useUpdateChat = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["updateChat"],
+    mutationFn: (data: {
+      name?: string;
+      description?: string;
+      chatId: number;
+    }) => updateChat(data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries("chats");
+      queryClient.invalidateQueries(["chatInfo", data.data?.updatedChat.id]);
+    },
   });
 };

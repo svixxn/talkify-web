@@ -1,11 +1,13 @@
 import { CreateChat } from "@/lib/validations";
 import {
+  Chat,
   ChatMessage,
   ChatParticipant,
   DefaultApiResponse,
   GeneralChatInfo,
   SignIn,
   SignUp,
+  User,
 } from "@/types";
 import { API_BASE_URL, authTokenName } from "@/utils/constants";
 import { getCookie } from "@/utils/general";
@@ -14,11 +16,6 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 type SearchUsersResponse = {
   message: string;
   users: { id: number; avatar: string; name: string }[];
-};
-
-type FetchChatsResponse = {
-  message: string;
-  userChats: GeneralChatInfo[];
 };
 
 type FetchChatInfoResponse = {
@@ -39,19 +36,33 @@ type CreateChatResponse = {
 
 type UpdateChatResponse = {
   message: string;
-  updatedChat: any;
+  updatedChat: Chat;
+};
+
+type CreateUserResponse = {
+  message: string;
+  userId: number;
+};
+
+type SignInResponse = {
+  message: string;
+  token: string;
+  userId: string;
+  expiresIn: string;
+};
+
+type GetUserByIdResponse = {
+  message: string;
+  user: User;
 };
 
 // users
 export const registerUser = async (
   data: Omit<SignUp, "confirmPassword">
-): Promise<DefaultApiResponse<any>> => {
+): Promise<DefaultApiResponse<CreateUserResponse>> => {
   try {
-    const res: AxiosResponse<FetchChatsResponse> = await axios.post(
-      `${API_BASE_URL}/users`,
-      data
-    );
-    return { data: res.data.userChats };
+    const res: AxiosResponse = await axios.post(`${API_BASE_URL}/users`, data);
+    return { data: res.data };
   } catch (err) {
     const error = err as AxiosError;
     return { error: error.response?.data };
@@ -60,7 +71,7 @@ export const registerUser = async (
 
 export const loginUser = async (
   data: SignIn
-): Promise<DefaultApiResponse<any>> => {
+): Promise<DefaultApiResponse<SignInResponse>> => {
   try {
     const res = await axios.post(`${API_BASE_URL}/users/sign-in`, data);
     return { data: res.data };
@@ -82,6 +93,23 @@ export const searchUsers = async (
         },
       }
     );
+
+    return { data: res.data };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { error: error.response?.data };
+  }
+};
+
+export const getUserById = async (
+  userId: number
+): Promise<DefaultApiResponse<GetUserByIdResponse>> => {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/users/${userId}`, {
+      headers: {
+        Authorization: "Bearer " + getCookie(authTokenName),
+      },
+    });
 
     return { data: res.data };
   } catch (err) {
@@ -161,7 +189,7 @@ export const createChat = async (
 
 export const deleteChat = async (
   chatId: number
-): Promise<DefaultApiResponse<any>> => {
+): Promise<DefaultApiResponse<{ message: string }>> => {
   try {
     const res = await axios.delete(`${API_BASE_URL}/chats/${chatId}`, {
       headers: {
@@ -180,7 +208,7 @@ export const sendChatMessage = async (data: {
   content: string;
   messageType: string;
   chatId: number;
-}): Promise<DefaultApiResponse<any>> => {
+}): Promise<DefaultApiResponse<{ message: string }>> => {
   try {
     const res = await axios.post(
       `${API_BASE_URL}/chats/${data.chatId}/messages`,

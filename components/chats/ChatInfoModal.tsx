@@ -7,9 +7,15 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import {
+  Calendar,
   Circle,
+  Github,
+  Globe,
+  Mail,
+  MapPin,
   MessagesSquare,
   Settings2,
+  Twitter,
   UserPlus,
   Users,
 } from "lucide-react";
@@ -20,13 +26,13 @@ import { AvatarFallback } from "../ui/avatar";
 import { Button } from "../ui/button";
 import ChatSettingsModal from "./ChatSettingsModal";
 import CustomDialogContent from "../shared/CustomDialogContent";
+import { Separator } from "../ui/separator";
 
 type Props = {
   id: number;
   name: string | undefined;
   photo: string | undefined;
   description: string | undefined;
-  isGroup: boolean | undefined;
   participants: ChatParticipant[] | undefined;
 };
 
@@ -35,7 +41,6 @@ const ChatInfoModal = ({
   name,
   photo,
   description,
-  isGroup,
   participants,
 }: Props) => {
   return (

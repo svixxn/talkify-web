@@ -4,6 +4,7 @@ import {
   deleteChat,
   getChatInfo,
   getChatMessages,
+  getUserById,
   getUserChats,
   loginUser,
   registerUser,
@@ -47,6 +48,13 @@ export const useSearchUsers = (searchValue: string) => {
   return useQuery({
     queryKey: ["searchUsers", searchValue],
     queryFn: () => searchUsers(searchValue),
+  });
+};
+
+export const useGetUserById = (userId: number) => {
+  return useQuery({
+    queryKey: ["getUserById", userId],
+    queryFn: () => getUserById(userId),
   });
 };
 

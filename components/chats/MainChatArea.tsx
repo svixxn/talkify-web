@@ -23,6 +23,7 @@ import { cn, convertDateWithoutOffset } from "@/lib/utils";
 import ChatEmptyState from "../shared/ChatEmptyState";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import ChatInfoModal from "./ChatInfoModal";
+import UserInfoModal from "../shared/UserInfoModal";
 
 type Props = {
   currentChatId: number;
@@ -145,14 +146,22 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
                 </div>
               </button>
             </DialogTrigger>
-            <ChatInfoModal
-              id={currentChatId}
-              name={chatInfo?.data?.chatInfo.name}
-              photo={chatInfo?.data?.chatInfo.photo}
-              participants={chatInfo?.data?.participants}
-              description={chatInfo?.data?.chatInfo.description}
-              isGroup={chatInfo?.data?.chatInfo.isGroup}
-            />
+            {chatInfo?.data?.chatInfo.isGroup ? (
+              <ChatInfoModal
+                id={currentChatId}
+                name={chatInfo?.data?.chatInfo.name}
+                photo={chatInfo?.data?.chatInfo.photo}
+                participants={chatInfo?.data?.participants}
+                description={chatInfo?.data?.chatInfo.description}
+              />
+            ) : (
+              <UserInfoModal
+                userId={
+                  chatInfo?.data?.participants.find((u) => u.id != user?.id)
+                    ?.id || 0
+                }
+              />
+            )}
           </Dialog>
         </div>
 

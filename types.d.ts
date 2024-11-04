@@ -15,6 +15,41 @@ export type DefaultApiResponse<T> = {
 };
 
 //Chats
+
+export type User = {
+  id: number;
+  name: string;
+  age: number;
+  avatar: string | null;
+  slug: string;
+  email: string;
+  phone: string | null;
+  bio: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type Chat = {
+  id: number;
+  name: string;
+  photo: string;
+  isGroup: boolean;
+  description: string;
+  createdAt: Date;
+  updatedAt: Date;
+  isDeleted: boolean;
+};
+
+export type Message = {
+  id: number;
+  createdAt: Date;
+  updatedAt: Date;
+  chatId: number;
+  senderId: number;
+  content: string;
+  messageType: "text" | "image" | "video" | "audio" | "file";
+};
+
 export type GeneralChatInfo = {
   chatId: number;
   name: string;

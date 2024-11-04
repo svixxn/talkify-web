@@ -16,6 +16,8 @@ export async function POST(request: Request) {
 
   if (res.error) return new Response(JSON.stringify({ error: res.error }));
 
+  if (!res.data) return new Response(JSON.stringify({ message: "error" }));
+
   const { token, expiresIn } = res.data;
 
   const finalExpiresData = addTimeToDate(expiresIn);

@@ -83,10 +83,6 @@ const ChatDropdownMenu = ({ chatId }: Props) => {
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              <span>View profile</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
               <MessageCircleOff className="mr-2 h-4 w-4" />
               <span>Clear history</span>
             </DropdownMenuItem>

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import {
+  clearChatHistory,
   createChat,
   deleteChat,
   getChatInfo,
@@ -84,6 +85,24 @@ export const useDeleteChat = () => {
     mutationKey: ["deleteChat"],
     mutationFn: (chatId: number) => deleteChat(chatId),
     onSuccess: () => {
+      queryClient.invalidateQueries("chats");
+    },
+  });
+};
+
+export const useClearChatHistory = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["clearChatHistory"],
+    mutationFn: (chatId: number, forAll = true) =>
+      clearChatHistory({ chatId, forAll }),
+    onSuccess: (data, chatId) => {
+      queryClient.setQueryData(["chatMessages", chatId], () => {
+        return {
+          data: [],
+        };
+      });
       queryClient.invalidateQueries("chats");
     },
   });

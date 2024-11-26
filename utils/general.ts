@@ -36,7 +36,7 @@ export const parseMessageDate = (timestamp: string) => {
   const offset = date.getTimezoneOffset();
 
   const now = new Date();
-  now.setMinutes(now.getMinutes() - offset);
+  // now.setMinutes(now.getMinutes() - offset);
 
   const diff = now.getTime() - date.getTime();
   const seconds = Math.floor(diff / 1000);

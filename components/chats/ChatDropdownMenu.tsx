@@ -31,7 +31,7 @@ import {
   AlertDialogTitle,
 } from "../ui/alert-dialog";
 import { useState } from "react";
-import { useDeleteChat } from "@/hooks/react-query";
+import { useClearChatHistory, useDeleteChat } from "@/hooks/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useChatContext } from "../shared/ChatContext";
 import { useSocket } from "../shared/SocketProvider";
@@ -42,10 +42,13 @@ type Props = {
 
 const ChatDropdownMenu = ({ chatId }: Props) => {
   const { toast } = useToast();
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [actionType, setActionType] = useState<"clear" | "delete" | undefined>(
+    undefined
+  );
   const { setCurrentChatId, setHasJoinedChats } = useChatContext();
 
   const { mutateAsync: deleteChatAction } = useDeleteChat();
+  const { mutateAsync: clearChatHistoryAction } = useClearChatHistory();
   const socket = useSocket();
 
   const handleDeleteChat = async () => {
@@ -67,11 +70,74 @@ const ChatDropdownMenu = ({ chatId }: Props) => {
 
     setHasJoinedChats(false);
     setCurrentChatId(null);
-    setDeleteModalOpen(false);
+    setActionType(undefined);
+  };
+
+  const handleClearHistory = async () => {
+    const res = await clearChatHistoryAction(chatId);
+
+    if (res.error) {
+      toast({
+        title: "An error occurred",
+        description: res.error.message,
+      });
+      return;
+    }
+
+    toast({
+      title: "History successfully cleared.",
+    });
+
+    setActionType(undefined);
+  };
+
+  const getModalContentByActionType = () => {
+    switch (actionType) {
+      case "clear":
+        return (
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will clear the chat history.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleClearHistory}>
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        );
+      case "delete":
+        return (
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the
+                chat and all its messages.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeleteChat}>
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
-    <AlertDialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+    <AlertDialog
+      open={actionType !== null}
+      onOpenChange={() => setActionType(undefined)}
+    >
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline">
@@ -82,13 +148,13 @@ const ChatDropdownMenu = ({ chatId }: Props) => {
           <DropdownMenuLabel>Chat settings</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setActionType("clear")}>
               <MessageCircleOff className="mr-2 h-4 w-4" />
               <span>Clear history</span>
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-red-500"
-              onClick={() => setDeleteModalOpen(true)}
+              onClick={() => setActionType("delete")}
             >
               <Trash2 className="mr-2 h-4 w-4" />
               <span>Delete chat</span>
@@ -97,21 +163,7 @@ const ChatDropdownMenu = ({ chatId }: Props) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the chat
-            and all its messages.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDeleteChat}>
-            Continue
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
+      {getModalContentByActionType()}
     </AlertDialog>
   );
 };

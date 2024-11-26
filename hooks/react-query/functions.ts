@@ -272,3 +272,44 @@ export const updateChat = async (data: {
     return { error: error.response?.data };
   }
 };
+
+export const clearChatHistory = async (data: {
+  chatId: number;
+}): Promise<DefaultApiResponse<any>> => {
+  try {
+    const res = await axios.post(
+      `${API_BASE_URL}/chats/${data.chatId}/messages`,
+      {
+        headers: {
+          Authorization: "Bearer " + getCookie(authTokenName),
+        },
+      }
+    );
+
+    return { data: res.data };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { error: error.response?.data };
+  }
+};
+
+export const deleteChatMessage = async (data: {
+  chatId: number;
+  messageId: number;
+}): Promise<DefaultApiResponse<any>> => {
+  try {
+    const res = await axios.delete(
+      `${API_BASE_URL}/chats/${data.chatId}/messages/${data.messageId}`,
+      {
+        headers: {
+          Authorization: "Bearer " + getCookie(authTokenName),
+        },
+      }
+    );
+
+    return { data: res.data };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { error: error.response?.data };
+  }
+};

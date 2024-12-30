@@ -3,6 +3,7 @@ import {
   clearChatHistory,
   createChat,
   deleteChat,
+  deleteChatMessage,
   getChatInfo,
   getChatMessages,
   getUserById,
@@ -95,8 +96,7 @@ export const useClearChatHistory = () => {
 
   return useMutation({
     mutationKey: ["clearChatHistory"],
-    mutationFn: (chatId: number, forAll = true) =>
-      clearChatHistory({ chatId, forAll }),
+    mutationFn: (chatId: number) => clearChatHistory({ chatId }),
     onSuccess: (data, chatId) => {
       queryClient.setQueryData(["chatMessages", chatId], () => {
         return {
@@ -132,6 +132,23 @@ export const useUpdateChat = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries("chats");
       queryClient.invalidateQueries(["chatInfo", data.data?.updatedChat.id]);
+    },
+  });
+};
+
+export const useDeleteChatMessage = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["deleteChatMessage"],
+    mutationFn: (data: { chatId: number; messageId: number }) =>
+      deleteChatMessage(data),
+    onSuccess: (data, chatId) => {
+      queryClient.setQueryData(["chatMessages", chatId], () => {
+        return {
+          data: [],
+        };
+      });
+      queryClient.invalidateQueries("chats");
     },
   });
 };

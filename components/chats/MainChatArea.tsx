@@ -181,6 +181,8 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
           <div ref={messagesAreaRef} className="grid gap-4">
             {chatMessages?.data?.map((message) => (
               <ChatMessage
+                id={message.id}
+                chatId={currentChatId}
                 key={message.id}
                 message={message.content}
                 isCurrentUserSender={user?.id === message.senderId}

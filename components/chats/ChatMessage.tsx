@@ -17,6 +17,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "../ui/context-menu";
+import { useToast } from "@/hooks/use-toast";
 
 type Props = {
   id: number;
@@ -34,15 +35,18 @@ const ChatMessage = ({
   chatId,
   id,
 }: Props) => {
+  const { toast } = useToast();
   const { mutateAsync: deleteChatMessageAction } = useDeleteChatMessage();
 
   const handleDeleteFunction = async () => {
+    console.log("Deleting message with id: ", id, chatId);
     const res = await deleteChatMessageAction({ messageId: id, chatId });
     if (res.error) {
-      console.log("An error occurred", res.error.message);
+      toast({
+        title: "An error occurred while deleting the message",
+      });
       return;
     }
-    console.log("Message successfully deleted");
   };
 
   return (

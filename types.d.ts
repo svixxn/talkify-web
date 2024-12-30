@@ -59,7 +59,7 @@ export type GeneralChatInfo = {
 };
 
 export type ChatMessage = {
-  id: string;
+  id: number;
   createdAt: string;
   senderId: number;
   chatId?: number;

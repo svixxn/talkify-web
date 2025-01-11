@@ -112,6 +112,7 @@ export const useSendMessage = () => {
   return useMutation({
     mutationKey: ["sendMessage"],
     mutationFn: (data: {
+      id: number;
       content: string;
       messageType: string;
       chatId: number;
@@ -137,18 +138,24 @@ export const useUpdateChat = () => {
 };
 
 export const useDeleteChatMessage = () => {
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["deleteChatMessage"],
     mutationFn: (data: { chatId: number; messageId: number }) =>
       deleteChatMessage(data),
-    onSuccess: (data, chatId) => {
-      queryClient.setQueryData(["chatMessages", chatId], () => {
-        return {
-          data: [],
-        };
-      });
-      queryClient.invalidateQueries("chats");
-    },
+    // onSuccess: (res, data) => {
+    //   queryClient.setQueryData(
+    //     ["chatMessages", data.chatId],
+    //     (prevData: any) => {
+    //       const newData = prevData.data.filter(
+    //         (message: any) => message.id !== data.messageId
+    //       );
+    //       return {
+    //         data: newData,
+    //       };
+    //     }
+    //   );
+    //   queryClient.invalidateQueries("chats");
+    // },
   });
 };

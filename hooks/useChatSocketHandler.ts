@@ -5,7 +5,10 @@ import { useToast } from "./use-toast";
 import { DefaultApiResponse, GeneralChatInfo } from "@/types";
 import { useChatContext } from "@/components/shared/ChatContext";
 import useScreenSize from "./useScreenWidth";
-import { updateMessagesStatus } from "@/lib/chats/helpers";
+import {
+  updateMessagesStatusOnDeleteMessage,
+  updateMessagesStatusOnNewMessage,
+} from "@/lib/chats/helpers";
 
 type UseChatSocketHandlerProps = {
   previousDataLength: number;
@@ -29,7 +32,11 @@ export const useChatSocketHandler = ({
     if (socket) {
       const handleReceivedMessage = (newChatData: string) => {
         const parsedData = JSON.parse(newChatData);
-        updateMessagesStatus(queryClient, parsedData.chatId, parsedData);
+        updateMessagesStatusOnNewMessage(
+          queryClient,
+          parsedData.chatId,
+          parsedData
+        );
       };
 
       const handleDeletedChat = (chatId: number) => {
@@ -45,12 +52,25 @@ export const useChatSocketHandler = ({
         );
       };
 
+      const handleDeleteMessage = (newChatData: string) => {
+        const parsedData: { chatId: number; messageId: number } =
+          JSON.parse(newChatData);
+        //TODO: reimplement this function so if suer hasnt fetched the messages yet, it doesnt break
+        updateMessagesStatusOnDeleteMessage(
+          queryClient,
+          parsedData.chatId,
+          parsedData.messageId
+        );
+      };
+
       socket.on("received-message", handleReceivedMessage);
       socket.on("delete-chat", handleDeletedChat);
+      socket.on("delete-message", handleDeleteMessage);
 
       return () => {
         socket.off("received-message", handleReceivedMessage);
         socket.off("delete-chat", handleDeletedChat);
+        socket.off("delete-message", handleDeleteMessage);
       };
     }
   }, [socket, queryClient, currentChatId, setCurrentChatId]);

@@ -208,6 +208,7 @@ export const sendChatMessage = async (data: {
   content: string;
   messageType: string;
   chatId: number;
+  id: number;
 }): Promise<DefaultApiResponse<{ message: string }>> => {
   try {
     const res = await axios.post(
@@ -215,6 +216,7 @@ export const sendChatMessage = async (data: {
       {
         content: data.content,
         messageType: data.messageType,
+        id: data.id,
       },
       {
         headers: {
@@ -307,7 +309,7 @@ export const deleteChatMessage = async (data: {
       }
     );
 
-    return { data: res.data };
+    return { data: res.data || "Message deleted" };
   } catch (err) {
     const error = err as AxiosError;
     return { error: error.response?.data };

@@ -18,6 +18,9 @@ import {
   ContextMenuTrigger,
 } from "../ui/context-menu";
 import { useToast } from "@/hooks/use-toast";
+import { updateMessagesStatusOnDeleteMessage } from "@/lib/chats/helpers";
+import { useQueryClient } from "react-query";
+import { useSocket } from "../shared/SocketProvider";
 
 type Props = {
   id: number;
@@ -37,9 +40,12 @@ const ChatMessage = ({
 }: Props) => {
   const { toast } = useToast();
   const { mutateAsync: deleteChatMessageAction } = useDeleteChatMessage();
+  const queryClient = useQueryClient();
+  const socket = useSocket();
 
   const handleDeleteFunction = async () => {
-    console.log("Deleting message with id: ", id, chatId);
+    updateMessagesStatusOnDeleteMessage(queryClient, chatId, id);
+    socket?.emit("delete-message", JSON.stringify({ chatId, messageId: id }));
     const res = await deleteChatMessageAction({ messageId: id, chatId });
     if (res.error) {
       toast({

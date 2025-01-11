@@ -18,7 +18,7 @@ import { ResizablePanel } from "../ui/resizable";
 import { useChatContext } from "../shared/ChatContext";
 import { ArrowLeftFromLine, Sparkles, Users } from "lucide-react";
 import MainChatAreaLoader from "./MainChatAreaLoader";
-import { updateMessagesStatus } from "@/lib/chats/helpers";
+import { updateMessagesStatusOnNewMessage } from "@/lib/chats/helpers";
 import { cn, convertDateWithoutOffset } from "@/lib/utils";
 import ChatEmptyState from "../shared/ChatEmptyState";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
@@ -73,12 +73,12 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
     )
       return;
 
-    const nowWithOffset = convertDateWithoutOffset(new Date());
+    const id = Math.floor(Math.random() * 1000000);
 
     const newMessageLocal = {
-      id: Date.now(),
-      createdAt: nowWithOffset.toISOString(),
-      updatedAt: nowWithOffset.toISOString(),
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
       senderId: user?.id,
       chatId: currentChatId,
       content: chatInputRef.current?.value,
@@ -86,13 +86,18 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
       senderAvatar: user?.avatar,
     };
 
-    updateMessagesStatus(queryClient, currentChatId, newMessageLocal);
+    updateMessagesStatusOnNewMessage(
+      queryClient,
+      currentChatId,
+      newMessageLocal
+    );
 
     socket.emit("chat-message", JSON.stringify(newMessageLocal));
 
     chatInputRef.current.value = "";
 
     await sendMessage({
+      id: newMessageLocal.id,
       chatId: currentChatId,
       content: newMessageLocal.content,
       messageType: "text",

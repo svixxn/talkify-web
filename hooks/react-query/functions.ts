@@ -209,6 +209,7 @@ export const sendChatMessage = async (data: {
   messageType: string;
   chatId: number;
   id: number;
+  parentId: number | null;
 }): Promise<DefaultApiResponse<{ message: string }>> => {
   try {
     const res = await axios.post(
@@ -217,6 +218,7 @@ export const sendChatMessage = async (data: {
         content: data.content,
         messageType: data.messageType,
         id: data.id,
+        parentId: data.parentId,
       },
       {
         headers: {
@@ -279,7 +281,7 @@ export const clearChatHistory = async (data: {
   chatId: number;
 }): Promise<DefaultApiResponse<any>> => {
   try {
-    const res = await axios.post(
+    const res = await axios.delete(
       `${API_BASE_URL}/chats/${data.chatId}/messages`,
       {
         headers: {

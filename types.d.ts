@@ -66,6 +66,13 @@ export type ChatMessage = {
   content: string;
   messageType: string;
   senderAvatar: string;
+  senderName: string;
+  parentId: number | null;
+  parentMessage?: {
+    id: number;
+    content: string;
+    sender: string;
+  };
 };
 
 //Users

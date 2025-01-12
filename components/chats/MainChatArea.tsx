@@ -16,7 +16,7 @@ import { useUserContext } from "../shared/UserContext";
 import { Input } from "../ui/input";
 import { ResizablePanel } from "../ui/resizable";
 import { useChatContext } from "../shared/ChatContext";
-import { ArrowLeftFromLine, Sparkles, Users } from "lucide-react";
+import { ArrowLeftFromLine, Sparkles, Users, X } from "lucide-react";
 import MainChatAreaLoader from "./MainChatAreaLoader";
 import { updateMessagesStatusOnNewMessage } from "@/lib/chats/helpers";
 import { cn, convertDateWithoutOffset } from "@/lib/utils";
@@ -36,6 +36,11 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
   const { data: chatMessages, isLoading: isChatMessagesLoading } =
     useFetchChatMessages(currentChatId);
   const { user } = useUserContext();
+  const [replyMessage, setReplyMessage] = useState<{
+    id: number;
+    content: string;
+    sender: string;
+  } | null>(null);
   const chatInputRef = useRef<HTMLInputElement>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
   const { setCurrentChatId } = useChatContext();
@@ -49,19 +54,24 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
     if (messagesAreaRef.current) {
       messagesAreaRef.current.scrollIntoView({
         block: "end",
+        behavior: "smooth",
       });
     }
   }, []);
 
   useEffect(() => {
-    if (chatMessages?.data) {
+    if (chatMessages?.data && chatInfo?.data) {
       scrollToBottom();
     }
 
     if (chatMessages?.error) {
       setCurrentChatId(null);
     }
-  }, [chatMessages, scrollToBottom, setCurrentChatId]);
+  }, [chatMessages, chatInfo, scrollToBottom, setCurrentChatId]);
+
+  useEffect(() => {
+    chatInputRef.current?.focus();
+  }, [replyMessage]);
 
   const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -84,6 +94,9 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
       content: chatInputRef.current?.value,
       messageType: "text",
       senderAvatar: user?.avatar,
+      senderName: user?.name,
+      parentId: replyMessage?.id || null,
+      parentMessage: replyMessage,
     };
 
     updateMessagesStatusOnNewMessage(
@@ -96,12 +109,19 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
 
     chatInputRef.current.value = "";
 
+    setReplyMessage(null);
+
     await sendMessage({
       id: newMessageLocal.id,
       chatId: currentChatId,
       content: newMessageLocal.content,
       messageType: "text",
+      parentId: newMessageLocal.parentId,
     });
+  };
+
+  const onCancelReply = () => {
+    setReplyMessage(null);
   };
 
   if (isChatInfoLoading || isChatMessagesLoading) {
@@ -193,25 +213,53 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
                 isCurrentUserSender={user?.id === message.senderId}
                 avatar={message.senderAvatar}
                 timestamp={new Date(message.createdAt)}
+                senderName={message.senderName}
+                parentMessage={message.parentMessage}
+                setReplyMessage={setReplyMessage}
               />
             ))}
           </div>
         </ScrollArea>
       )}
-      <form
-        onSubmit={handleSendMessage}
-        className="flex items-center px-4 py-2 md:px-6 gap-2"
-      >
-        <Input
-          ref={chatInputRef}
-          placeholder="Type your message..."
-          className="h-16 flex-1 resize-none rounded-md border border-input pr-20 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-        />
-        <Button type="submit" size="icon" className="absolute right-12">
-          <SendIcon className="h-4 w-4" />
-          <span className="sr-only">Send</span>
-        </Button>
-      </form>
+      {replyMessage && (
+        <div className="flex bg-[#02040d] items-start gap-3 p-3 pl-4 border-t border-accent/50">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
+              <span>Replying to</span>
+              <span className="font-medium text-primary">
+                {replyMessage.sender}
+              </span>
+            </div>
+            <p className="text-sm text-muted-foreground truncate">
+              {replyMessage.content}
+            </p>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 text-muted-foreground hover:text-primary"
+            onClick={onCancelReply}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+      <div className="flex flex-col bg-[#02040d] border-t border-input py-1">
+        <form
+          onSubmit={handleSendMessage}
+          className="flex items-center px-4 py-2 md:px-6 gap-2"
+        >
+          <Input
+            ref={chatInputRef}
+            placeholder="Type your message..."
+            className="h-16 flex-1 bg-[#1D283A80] resize-none rounded-md border border-input pr-20 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          />
+          <Button type="submit" size="icon" className="absolute right-12">
+            <SendIcon className="h-4 w-4" />
+            <span className="sr-only">Send</span>
+          </Button>
+        </form>
+      </div>
     </ResizablePanel>
   );
 };

@@ -43,6 +43,7 @@ export const useFetchChatMessages = (chatId: number) => {
   return useQuery({
     queryKey: ["chatMessages", chatId],
     queryFn: () => getChatMessages(chatId),
+    refetchOnWindowFocus: false,
   });
 };
 
@@ -116,6 +117,7 @@ export const useSendMessage = () => {
       content: string;
       messageType: string;
       chatId: number;
+      parentId: number | null;
     }) => sendChatMessage(data),
   });
 };

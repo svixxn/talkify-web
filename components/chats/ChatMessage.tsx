@@ -21,6 +21,9 @@ import { useToast } from "@/hooks/use-toast";
 import { updateMessagesStatusOnDeleteMessage } from "@/lib/chats/helpers";
 import { useQueryClient } from "react-query";
 import { useSocket } from "../shared/SocketProvider";
+import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
+import { Reply } from "lucide-react";
 
 type Props = {
   id: number;
@@ -29,6 +32,15 @@ type Props = {
   timestamp: Date;
   avatar?: string;
   chatId: number;
+  senderName: string;
+  parentMessage?: {
+    id: number;
+    content: string;
+    sender: string;
+  };
+  setReplyMessage: React.Dispatch<
+    React.SetStateAction<{ id: number; content: string; sender: string } | null>
+  >;
 };
 const ChatMessage = ({
   message,
@@ -37,6 +49,9 @@ const ChatMessage = ({
   avatar,
   chatId,
   id,
+  setReplyMessage,
+  senderName,
+  parentMessage,
 }: Props) => {
   const { toast } = useToast();
   const { mutateAsync: deleteChatMessageAction } = useDeleteChatMessage();
@@ -55,59 +70,95 @@ const ChatMessage = ({
     }
   };
 
+  const handleRespondMessage = () => {
+    setReplyMessage((prev) => ({
+      ...prev,
+      id,
+      content: message,
+      sender: senderName,
+    }));
+  };
+
   return (
-    <AlertDialog>
-      <ContextMenu>
-        <ContextMenuTrigger>
-          <div
-            className={`flex items-start  gap-3 ${
-              isCurrentUserSender && "justify-end"
-            }`}
-          >
-            {!isCurrentUserSender && (
-              <Avatar className="h-10 w-10 border">
-                <AvatarImage src={avatar} alt="Avatar" />
-                <AvatarFallback>User</AvatarFallback>
-              </Avatar>
-            )}
-
+    <div>
+      {parentMessage && (
+        <div
+          className={cn(
+            "flex items-center gap-2 text-xs mb-2 text-muted-foreground",
+            isCurrentUserSender ? "justify-end mr-3" : "ml-3"
+          )}
+        >
+          <span>Replying to</span>
+          <span className="font-medium text-primary">
+            {parentMessage.sender}
+          </span>
+          <span className="truncate max-w-[200px]">
+            {parentMessage.content}
+          </span>
+        </div>
+      )}
+      <AlertDialog>
+        <ContextMenu>
+          <ContextMenuTrigger>
             <div
-              className={`rounded-2xl flex items-center max-w-72 gap-2 ${
-                isCurrentUserSender
-                  ? "message-own text-primary-foreground rounded-br-sm"
-                  : "message-system text-primary rounded-bl-sm"
-              } text-sm`}
+              className={`flex items-start gap-3 ${
+                isCurrentUserSender && "justify-end"
+              }`}
             >
-              <p className="pl-2 py-2 break-all">{message}</p>
-              <span className="text-[10px] opacity-80 mt-auto p-1 pr-2">
-                {timestamp.getHours() + ":" + timestamp.getMinutes()}
-              </span>
+              {!isCurrentUserSender && (
+                <Avatar className="h-10 w-10 border">
+                  <AvatarImage src={avatar} alt="Avatar" />
+                  <AvatarFallback>User</AvatarFallback>
+                </Avatar>
+              )}
+              <div className="flex flex-row items-center group gap-2">
+                <div
+                  className={`rounded-2xl flex items-center max-w-72 gap-2 ${
+                    isCurrentUserSender
+                      ? "message-own text-primary-foreground rounded-br-sm"
+                      : "message-system text-primary rounded-bl-sm"
+                  } text-sm`}
+                >
+                  <p className="pl-2 py-2 break-all">{message}</p>
+                  <span className="text-[10px] opacity-80 mt-auto p-1 pr-2">
+                    {timestamp.getHours() + ":" + timestamp.getMinutes()}
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={handleRespondMessage}
+                >
+                  <Reply className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-          </div>
-        </ContextMenuTrigger>
-        <ContextMenuContent>
-          <AlertDialogTrigger>
-            <ContextMenuItem className="text-red-500">Delete</ContextMenuItem>
-          </AlertDialogTrigger>
-        </ContextMenuContent>
-      </ContextMenu>
+          </ContextMenuTrigger>
+          <ContextMenuContent>
+            <AlertDialogTrigger className="w-full">
+              <ContextMenuItem className="text-red-500">Delete</ContextMenuItem>
+            </AlertDialogTrigger>
+          </ContextMenuContent>
+        </ContextMenu>
 
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action will delete this message for you and for your
-            interlocutor.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDeleteFunction}>
-            Continue
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action will delete this message for you and for your
+              interlocutor.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteFunction}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 };
 

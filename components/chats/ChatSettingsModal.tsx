@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { title } from "process";
+import { UploadButton } from "@/utils/uploadthing";
 
 type Props = {
   id: number;
@@ -67,16 +68,16 @@ const ChatSettingsModal = ({ id, name, description, image }: Props) => {
     }
   };
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotoPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  // const handlePhotoChange = (e: any) => {
+  //   const file = e;
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onload = () => {
+  //       setPhotoPreview(reader.result as string);
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
 
   const handleRemovePhoto = () => {
     setPhotoPreview(null);
@@ -124,23 +125,27 @@ const ChatSettingsModal = ({ id, name, description, image }: Props) => {
               )}
             </div>
             <div className="space-y-2">
-              <Input
+              {/* <Input
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 onChange={handlePhotoChange}
                 className="hidden"
                 id="chat-photo"
+              /> */}
+              <UploadButton
+                endpoint="imageUploader"
+                className="border px-4 pb-2 border-input bg-background hover:bg-accent hover:text-accent-foreground inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+                onClientUploadComplete={(res) => {
+                  // console.log("Files: ", res);
+                  alert("Upload Completed");
+                }}
+                onUploadError={(error: Error) => {
+                  // Do something with the error.
+                  alert(`ERROR! ${error.message}`);
+                }}
+                // {...register("image")}
               />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                className="gap-2"
-              >
-                <Upload className="w-4 h-4" />
-                Upload Photo
-              </Button>
               <p className="text-xs text-muted-foreground">
                 Recommended: Square image, at least 256x256px
               </p>

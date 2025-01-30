@@ -34,6 +34,7 @@ const ChatSettingsModal = ({ id, name, description, image }: Props) => {
   const {
     register,
     setError,
+    resetField,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<UpdateChat>({
@@ -49,8 +50,11 @@ const ChatSettingsModal = ({ id, name, description, image }: Props) => {
 
   const onSubmit: SubmitHandler<UpdateChat> = async (data) => {
     try {
-      console.log("data", data);
-      const res = await updateChatAction({ chatId: id, ...data });
+      const res = await updateChatAction({
+        chatId: id,
+        ...data,
+        image: photoPreview,
+      });
 
       if (res.error) {
         setError("name", {
@@ -59,11 +63,26 @@ const ChatSettingsModal = ({ id, name, description, image }: Props) => {
         return;
       }
 
+      handleRemovePhoto();
+
       toast({
         title: "Chat updated successfully",
       });
     } catch (err) {
       console.log("err");
+    }
+  };
+
+  const handleChangePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      return file;
     }
   };
 
@@ -115,18 +134,7 @@ const ChatSettingsModal = ({ id, name, description, image }: Props) => {
                 accept="image/*"
                 id="chat-photo"
                 className="hidden"
-                {...register("image", {
-                  onChange: (e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        setPhotoPreview(reader.result as string);
-                      };
-                      reader.readAsDataURL(file);
-                    }
-                  },
-                })}
+                onChange={handleChangePhoto}
               />
               <Button
                 type="button"
@@ -140,9 +148,6 @@ const ChatSettingsModal = ({ id, name, description, image }: Props) => {
               <p className="text-xs text-muted-foreground">
                 Recommended: Square image, at least 256x256px
               </p>
-              {errors.image && (
-                <p className="text-xs text-red-500">{errors.image.message}</p>
-              )}
             </div>
           </div>
         </div>

@@ -131,6 +131,7 @@ export const useUpdateChat = () => {
       name?: string;
       description?: string;
       chatId: number;
+      image: string | null;
     }) => updateChat(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries("chats");

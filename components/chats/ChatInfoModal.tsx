@@ -49,7 +49,10 @@ const ChatInfoModal = ({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
             <div className="flex items-center justify-center w-16 h-16 rounded-full bg-accent">
-              <MessagesSquare className="w-8 h-8 text-accent-foreground" />
+              <Avatar className="w-full h-full object-cover">
+                <AvatarImage src={photo} alt="Avatar" />
+                <AvatarFallback>{name}</AvatarFallback>
+              </Avatar>
             </div>
             <div>
               <DialogTitle className="text-xl font-semibold text-primary">

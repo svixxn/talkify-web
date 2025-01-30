@@ -1,3 +1,4 @@
+import { uploadOne } from "@/lib/actions/cloudinary";
 import { CreateChat } from "@/lib/validations";
 import {
   Chat,
@@ -255,13 +256,27 @@ export const updateChat = async (data: {
   name?: string;
   description?: string;
   chatId: number;
+  image: string | null | undefined;
 }): Promise<DefaultApiResponse<UpdateChatResponse>> => {
   try {
+    if (data.image) {
+      const result = await uploadOne({
+        file: data.image,
+        folder: "talkify/chats",
+        public_id: `${data.chatId}`,
+      });
+
+      if (typeof result === "string") {
+        data.image = result;
+      }
+    } else delete data.image;
+
     const res = await axios.patch(
       `${API_BASE_URL}/chats/${data.chatId}`,
       {
         name: data.name,
         description: data.description,
+        ...(data.image && { photo: data.image }),
       },
       {
         headers: {

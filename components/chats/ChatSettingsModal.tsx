@@ -21,7 +21,6 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { title } from "process";
-import { UploadButton } from "@/utils/uploadthing";
 
 type Props = {
   id: number;

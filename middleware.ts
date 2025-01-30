@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authTokenName } from "./utils/constants";
 
 export const config = {
-  matcher: ["/chat", "/"],
+  matcher: ["/chat"],
 };
 
 export function middleware(request: NextRequest) {

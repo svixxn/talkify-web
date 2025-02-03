@@ -77,7 +77,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
   const handleSendMessage = async (message: string, files?: File[]) => {
     if ((!message && !files) || !socket) return;
 
-    const id = Math.floor(Math.random() * 1000000);
+    const id = Date.now();
 
     const newMessageLocal = {
       id,
@@ -214,6 +214,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
         </ScrollArea>
       )}
       <ChatInput
+        chatId={currentChatId}
         replyMessage={replyMessage}
         onCancelReply={onCancelReply}
         onSendMessage={handleSendMessage}

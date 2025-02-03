@@ -1,10 +1,12 @@
-import { File, ImageIcon, Paperclip, SendIcon, X } from "lucide-react";
+import { File, ImageIcon, Loader2, Paperclip, SendIcon, X } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useRef, useState } from "react";
-import { Progress } from "../ui/progress";
+import { cn } from "@/lib/utils";
+import { deleteOne, uploadOne } from "@/lib/actions/cloudinary";
 
 type Props = {
+  chatId: number;
   onSendMessage: (message: string, files?: File[]) => void;
   replyMessage?: {
     id: number;
@@ -14,18 +16,18 @@ type Props = {
   onCancelReply?: () => void;
   chatInputRef: React.RefObject<HTMLInputElement>;
 };
-
 type FilePreview = {
+  id: number;
   file: File;
   preview?: string;
-  progress: number;
+  loading: boolean;
 };
-
 const ChatInput = ({
   replyMessage,
   onSendMessage,
   onCancelReply,
   chatInputRef,
+  chatId,
 }: Props) => {
   const [files, setFiles] = useState<FilePreview[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -55,37 +57,48 @@ const ChatInput = ({
           });
         }
 
-        const filePreview: FilePreview = {
+        return {
+          id: Date.now() + Math.random(),
           file,
           preview,
-          progress: 0,
+          loading: true,
         };
-
-        const interval = setInterval(() => {
-          setFiles((current) =>
-            current.map((f) =>
-              f.file === file
-                ? { ...f, progress: Math.min(f.progress + 10, 100) }
-                : f
-            )
-          );
-        }, 200);
-
-        setTimeout(() => clearInterval(interval), 2000);
-
-        return filePreview;
       })
     );
 
     setFiles((current) => [...current, ...newFiles]);
+
+    newFiles.forEach(async (filePreview) => {
+      if (filePreview.preview) {
+        const result = await uploadOne({
+          file: filePreview.preview,
+          folder: "talkify/media",
+          public_id: `${chatId}_${filePreview.id}`,
+        });
+
+        if (typeof result === "string") {
+          setFiles((current) =>
+            current.map((f) =>
+              f === filePreview ? { ...f, loading: false } : f
+            )
+          );
+        }
+      }
+    });
 
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  const removeFile = (file: File) => {
-    setFiles((current) => current.filter((f) => f.file !== file));
+  const removeFile = async (file: File) => {
+    const removedFile = files.find((f) => f.file === file);
+    setFiles((current) => current.filter((f) => f !== removedFile));
+
+    deleteOne({
+      folder: "talkify/media",
+      public_id: `${chatId}_${removedFile?.id}`,
+    });
   };
 
   const getFileIcon = (file: File) => {
@@ -102,19 +115,36 @@ const ChatInput = ({
           {files.map((filePreview, index) => (
             <div
               key={index}
-              className="relative group flex items-center gap-2 bg-accent/50 rounded-lg p-2 pr-8"
+              className="relative group flex items-center gap-2 bg-accent/50 rounded-lg p-2"
             >
-              {filePreview.preview ? (
-                <img
-                  src={filePreview.preview}
-                  alt="Preview"
-                  className="w-8 h-8 rounded object-cover"
-                />
-              ) : (
-                <div className="w-8 h-8 rounded bg-accent/50 flex items-center justify-center">
-                  {getFileIcon(filePreview.file)}
-                </div>
-              )}
+              <div className="relative">
+                {filePreview.preview ? (
+                  <div>
+                    <img
+                      src={filePreview.preview}
+                      alt="Preview"
+                      className={cn(
+                        "w-8 h-8 rounded object-cover",
+                        filePreview.loading && "opacity-50"
+                      )}
+                    />
+                    {filePreview.loading && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded">
+                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="relative w-8 h-8 rounded bg-accent/50 flex items-center justify-center">
+                    {getFileIcon(filePreview.file)}
+                    {filePreview.loading && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded">
+                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
               <div className="flex flex-col min-w-0">
                 <span className="text-sm truncate max-w-[150px]">
                   {filePreview.file.name}
@@ -123,16 +153,10 @@ const ChatInput = ({
                   {(filePreview.file.size / 1024).toFixed(1)} KB
                 </span>
               </div>
-              {filePreview.progress < 100 && (
-                <Progress
-                  value={filePreview.progress}
-                  className="h-1 w-full absolute bottom-0 left-0"
-                />
-              )}
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6 absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity ml-2"
                 onClick={() => removeFile(filePreview.file)}
               >
                 <X className="h-3 w-3" />

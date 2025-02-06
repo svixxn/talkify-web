@@ -74,23 +74,24 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
     chatInputRef.current?.focus();
   }, [replyMessage]);
 
-  const handleSendMessage = async (message: string, files?: File[]) => {
-    if ((!message && !files) || !socket) return;
+  const handleSendMessage = async (message?: string, files?: string[]) => {
+    if ((!message && !files) || !socket || !user) return;
 
-    const id = Date.now();
+    const id = Math.floor(Math.random() * 1000000);
 
     const newMessageLocal = {
       id,
       createdAt: new Date(),
       updatedAt: new Date(),
-      senderId: user?.id,
+      senderId: user.id,
       chatId: currentChatId,
-      content: message,
+      content: message || "",
       messageType: "text",
-      senderAvatar: user?.avatar,
-      senderName: user?.name,
+      senderAvatar: user.avatar,
+      senderName: user.name,
       parentId: replyMessage?.id || null,
       parentMessage: replyMessage,
+      files: files || [],
     };
 
     updateMessagesStatusOnNewMessage(
@@ -109,6 +110,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
       content: newMessageLocal.content,
       messageType: "text",
       parentId: newMessageLocal.parentId,
+      files: newMessageLocal.files,
     });
   };
 
@@ -198,6 +200,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
           <div ref={messagesAreaRef} className="grid gap-4">
             {chatMessages?.data?.map((message) => (
               <ChatMessage
+                files={message.files}
                 id={message.id}
                 chatId={currentChatId}
                 key={message.id}

@@ -118,6 +118,7 @@ export const useSendMessage = () => {
       messageType: string;
       chatId: number;
       parentId: number | null;
+      files: string[];
     }) => sendChatMessage(data),
   });
 };

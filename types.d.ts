@@ -20,7 +20,7 @@ export type User = {
   id: number;
   name: string;
   age: number;
-  avatar: string | null;
+  avatar: string;
   slug: string;
   email: string;
   phone: string | null;
@@ -73,6 +73,7 @@ export type ChatMessage = {
     content: string;
     sender: string;
   };
+  files: string[];
 };
 
 //Users

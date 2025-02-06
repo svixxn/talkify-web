@@ -1,10 +1,29 @@
 import { GeneralChatInfo } from "@/types";
 import { QueryClient } from "react-query";
 
+type LocalMessage = {
+  id: number;
+  createdAt: Date;
+  updatedAt: Date;
+  senderId: number;
+  chatId: number;
+  content: string;
+  messageType: string;
+  senderAvatar: string;
+  senderName: string;
+  parentId: number | null;
+  parentMessage?: {
+    id: number;
+    content: string;
+    sender: string;
+  } | null;
+  files: string[];
+};
+
 export function updateMessagesStatusOnNewMessage(
   queryClient: QueryClient,
   chatId: number,
-  message: any
+  message: LocalMessage
 ) {
   queryClient.setQueryData(["chatMessages", chatId], (oldData: any) => {
     return {

@@ -23,7 +23,7 @@ import { useQueryClient } from "react-query";
 import { useSocket } from "../shared/SocketProvider";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
-import { Reply } from "lucide-react";
+import { Download, Reply } from "lucide-react";
 
 type Props = {
   id: number;
@@ -33,6 +33,7 @@ type Props = {
   avatar?: string;
   chatId: number;
   senderName: string;
+  files: string[];
   parentMessage?: {
     id: number;
     content: string;
@@ -52,6 +53,7 @@ const ChatMessage = ({
   setReplyMessage,
   senderName,
   parentMessage,
+  files,
 }: Props) => {
   const { toast } = useToast();
   const { mutateAsync: deleteChatMessageAction } = useDeleteChatMessage();
@@ -119,10 +121,50 @@ const ChatMessage = ({
                       : "message-system text-primary rounded-bl-sm"
                   } text-sm`}
                 >
-                  <p className="pl-2 py-2 break-all">{message}</p>
-                  <span className="text-[10px] opacity-80 mt-auto p-1 pr-2">
-                    {timestamp.getHours() + ":" + timestamp.getMinutes()}
-                  </span>
+                  <div className="flex flex-col">
+                    {files?.length > 0 && (
+                      <div className="flex gap-1 p-1">
+                        {files.map((file, index) => (
+                          <div key={index} className="relative group/image">
+                            <img
+                              src={file}
+                              alt={file}
+                              className={`${
+                                files.length === 1
+                                  ? "rounded-t-xl"
+                                  : `${
+                                      index === 0
+                                        ? "rounded-tl-xl"
+                                        : `${
+                                            index === files.length - 1
+                                              ? "rounded-tr-xl"
+                                              : ""
+                                          }`
+                                    }`
+                              } max-h-[200px] object-cover`}
+                            />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/image:opacity-100 transition-opacity rounded-t-lg flex items-center justify-center">
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                className="gap-2"
+                                onClick={() => window.open(file, "_blank")}
+                              >
+                                <Download className="w-4 h-4" />
+                                Download
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <p className="pl-2 py-2 break-all">{message}</p>
+                      <span className="text-[10px] opacity-80 mt-auto ml-auto p-1 pr-2">
+                        {timestamp.getHours() + ":" + timestamp.getMinutes()}
+                      </span>
+                    </div>
+                  </div>
                 </div>
                 <Button
                   variant="ghost"

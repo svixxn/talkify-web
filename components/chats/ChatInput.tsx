@@ -7,7 +7,7 @@ import { deleteOne, uploadOne } from "@/lib/actions/cloudinary";
 
 type Props = {
   chatId: number;
-  onSendMessage: (message: string, files?: File[]) => void;
+  onSendMessage: (message: string, files?: string[]) => void;
   replyMessage?: {
     id: number;
     content: string;
@@ -21,7 +21,9 @@ type FilePreview = {
   file: File;
   preview?: string;
   loading: boolean;
+  link: string;
 };
+
 const ChatInput = ({
   replyMessage,
   onSendMessage,
@@ -32,11 +34,12 @@ const ChatInput = ({
   const [files, setFiles] = useState<FilePreview[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = (e: React.SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault();
     const message = chatInputRef.current?.value.trim() || "";
     onSendMessage(
       message.trim(),
-      files.map((f) => f.file)
+      files.map((f) => f.link)
     );
     chatInputRef.current!.value = "";
     setFiles([]);
@@ -62,6 +65,7 @@ const ChatInput = ({
           file,
           preview,
           loading: true,
+          link: "",
         };
       })
     );
@@ -79,7 +83,7 @@ const ChatInput = ({
         if (typeof result === "string") {
           setFiles((current) =>
             current.map((f) =>
-              f === filePreview ? { ...f, loading: false } : f
+              f === filePreview ? { ...f, loading: false, link: result } : f
             )
           );
         }
@@ -189,7 +193,11 @@ const ChatInput = ({
           </Button>
         </div>
       )}
-      <div className="flex flex-col bg-[#02040d] border-t border-input py-1">
+
+      <form
+        onSubmit={handleSendMessage}
+        className="flex flex-col bg-[#02040d] border-t border-input py-1"
+      >
         <div className="flex items-center px-4 py-2 md:px-6 gap-2">
           <input
             type="file"
@@ -200,6 +208,7 @@ const ChatInput = ({
           />
           <Button
             variant="ghost"
+            type="button"
             size="icon"
             className="h-[50px] w-[50px]"
             onClick={() => fileInputRef.current?.click()}
@@ -211,16 +220,12 @@ const ChatInput = ({
             placeholder="Type your message..."
             className="h-16 flex-1 bg-[#1D283A80] resize-none rounded-md border border-input pr-20 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
           />
-          <Button
-            onClick={handleSendMessage}
-            size="icon"
-            className="absolute right-12"
-          >
+          <Button size="icon" className="absolute right-12" type="submit">
             <SendIcon className="h-4 w-4" />
             <span className="sr-only">Send</span>
           </Button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

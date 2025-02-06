@@ -211,6 +211,7 @@ export const sendChatMessage = async (data: {
   chatId: number;
   id: number;
   parentId: number | null;
+  files: string[];
 }): Promise<DefaultApiResponse<{ message: string }>> => {
   try {
     const res = await axios.post(
@@ -220,6 +221,7 @@ export const sendChatMessage = async (data: {
         messageType: data.messageType,
         id: data.id,
         parentId: data.parentId,
+        files: data.files,
       },
       {
         headers: {

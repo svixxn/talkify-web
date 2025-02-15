@@ -24,6 +24,7 @@ import { useSocket } from "../shared/SocketProvider";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Download, Reply } from "lucide-react";
+import Image from "next/image";
 
 type Props = {
   id: number;
@@ -81,6 +82,23 @@ const ChatMessage = ({
     }));
   };
 
+  const getImageClassnames = (index: number) => {
+    if (files.length === 1) {
+      return "rounded-t-xl";
+    } else {
+      if (index === 0) {
+        return "rounded-tl-xl";
+      } else if (
+        (index === files.length - 1 && files.length < 4) ||
+        index % 3 === 0
+      ) {
+        return "rounded-tr-xl";
+      }
+
+      return "";
+    }
+  };
+
   return (
     <div>
       {parentMessage && (
@@ -113,9 +131,9 @@ const ChatMessage = ({
                   <AvatarFallback>User</AvatarFallback>
                 </Avatar>
               )}
-              <div className="flex flex-row items-center group gap-2">
+              <div className="flex flex-row max-w-[75%] items-center group gap-2">
                 <div
-                  className={`rounded-2xl flex items-center max-w-72 gap-2 ${
+                  className={`rounded-2xl flex items-center gap-2 ${
                     isCurrentUserSender
                       ? "message-own text-primary-foreground rounded-br-sm"
                       : "message-system text-primary rounded-bl-sm"
@@ -123,25 +141,22 @@ const ChatMessage = ({
                 >
                   <div className="flex flex-col">
                     {files?.length > 0 && (
-                      <div className="flex gap-1 p-1">
+                      <div
+                        className={`${
+                          files.length > 4 ? "grid grid-cols-4" : "flex"
+                        } gap-1 p-1`}
+                      >
                         {files.map((file, index) => (
                           <div key={index} className="relative group/image">
-                            <img
+                            <Image
+                              width={200}
+                              height={200}
                               src={file}
                               alt={file}
-                              className={`${
-                                files.length === 1
-                                  ? "rounded-t-xl"
-                                  : `${
-                                      index === 0
-                                        ? "rounded-tl-xl"
-                                        : `${
-                                            index === files.length - 1
-                                              ? "rounded-tr-xl"
-                                              : ""
-                                          }`
-                                    }`
-                              } max-h-[200px] object-cover`}
+                              className={cn(
+                                "max-h-[200px] object-cover",
+                                getImageClassnames(index)
+                              )}
                             />
                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/image:opacity-100 transition-opacity rounded-t-lg flex items-center justify-center">
                               <Button

@@ -98,8 +98,10 @@ export function updateMessagesStatusOnDeleteMessage(
 
       const newChats = oldData.data.sort(
         (a: GeneralChatInfo, b: GeneralChatInfo) => {
-          if (!a.lastMessageDate) return -1;
-          if (!b.lastMessageDate) return 1;
+          if (!a.lastMessageDate && !b.lastMessageDate) return 0;
+          if (!a.lastMessageDate) return 1;
+          if (!b.lastMessageDate) return -1;
+
           return (
             new Date(b.lastMessageDate).getTime() -
             new Date(a.lastMessageDate).getTime()

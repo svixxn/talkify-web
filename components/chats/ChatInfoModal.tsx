@@ -27,13 +27,15 @@ import { Button } from "../ui/button";
 import ChatSettingsModal from "./ChatSettingsModal";
 import CustomDialogContent from "../shared/CustomDialogContent";
 import { Separator } from "../ui/separator";
+import InviteUsersToChatModal from "./InviteUsersToChatModal";
+import { useState } from "react";
 
 type Props = {
   id: number;
-  name: string | undefined;
-  photo: string | undefined;
+  name: string;
+  photo: string;
   description: string | undefined;
-  participants: ChatParticipant[] | undefined;
+  participants: ChatParticipant[];
 };
 
 const ChatInfoModal = ({
@@ -43,6 +45,7 @@ const ChatInfoModal = ({
   description,
   participants,
 }: Props) => {
+  const [open, setOpen] = useState(false);
   return (
     <CustomDialogContent>
       <DialogHeader>
@@ -93,19 +96,24 @@ const ChatInfoModal = ({
                 {participants?.length}
               </span>
             </div>
-            {/* <Dialog>
+            <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
+                <Button
+                  onClick={() => setOpen(true)}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                >
                   <UserPlus className="w-4 h-4" />
                   Add Member
                 </Button>
               </DialogTrigger>
-              <ChatSettingsModal
-                id={id}
-                name={name}
-                description={description}
+              <InviteUsersToChatModal
+                chatId={id}
+                participants={participants.map((user) => user.id)}
+                setOpen={setOpen}
               />
-            </Dialog> */}
+            </Dialog>
           </div>
 
           <ScrollArea className="h-[200px] pr-4">

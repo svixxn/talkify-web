@@ -85,7 +85,7 @@ const UserDropdownMenu = ({ username }: Props) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <CreateChatModal open={modalOpen} setOpen={setModalOpen} />
+      <CreateChatModal setOpen={setModalOpen} />
     </Dialog>
   );
 };

@@ -49,3 +49,9 @@ export const UpdateChatSchema = z.object({
   name: z.string().min(4).max(52).optional(),
   description: z.string().optional(),
 });
+
+export const InviteUsersToChatSchema = z.object({
+  users: z.array(z.number()).min(1),
+});
+
+export type InviteUsersToChat = z.infer<typeof InviteUsersToChatSchema>;

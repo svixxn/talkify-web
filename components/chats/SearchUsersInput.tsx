@@ -36,7 +36,6 @@ type Props = {
 
 const SearchUsersInput = ({ value, setValue }: Props) => {
   const [open, setOpen] = useState(false);
-  // const [searchValue, setSearchValue] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
 
   const { data: users } = useSearchUsersToCreateChat();

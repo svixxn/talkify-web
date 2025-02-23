@@ -33,11 +33,10 @@ import { useChatContext } from "../shared/ChatContext";
 import CustomDialogContent from "../shared/CustomDialogContent";
 
 type Props = {
-  open: boolean;
   setOpen: (open: boolean) => void;
 };
 
-const CreateChatModal = ({ open, setOpen }: Props) => {
+const CreateChatModal = ({ setOpen }: Props) => {
   const { toast } = useToast();
 
   const { setCurrentChatId, setHasJoinedChats } = useChatContext();

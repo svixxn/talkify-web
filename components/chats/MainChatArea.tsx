@@ -168,9 +168,9 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
             {chatInfo?.data?.chatInfo.isGroup ? (
               <ChatInfoModal
                 id={currentChatId}
-                name={chatInfo?.data?.chatInfo.name}
-                photo={chatInfo?.data?.chatInfo.photo}
-                participants={chatInfo?.data?.participants}
+                name={chatInfo?.data?.chatInfo.name!}
+                photo={chatInfo?.data?.chatInfo.photo!}
+                participants={chatInfo?.data?.participants!}
                 description={chatInfo?.data?.chatInfo.description}
               />
             ) : (

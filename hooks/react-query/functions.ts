@@ -83,11 +83,15 @@ export const loginUser = async (
 };
 
 export const searchUsers = async (
-  searchValue: string
+  searchValue: string,
+  filtered?: number[]
 ): Promise<DefaultApiResponse<SearchUsersResponse>> => {
   try {
-    const res = await axios.get(
+    const res = await axios.post(
       `${API_BASE_URL}/users/search?s=${searchValue}`,
+      {
+        filtered,
+      },
       {
         headers: {
           Authorization: "Bearer " + getCookie(authTokenName),
@@ -329,6 +333,28 @@ export const deleteChatMessage = async (data: {
     );
 
     return { data: res.data || "Message deleted" };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { error: error.response?.data };
+  }
+};
+
+export const inviteUsersToChat = async (data: {
+  users: number[];
+  chatId: number;
+}): Promise<DefaultApiResponse<{ message: string }>> => {
+  try {
+    const res = await axios.post(
+      `${API_BASE_URL}/chats/${data.chatId}/invite`,
+      { users: data.users },
+      {
+        headers: {
+          Authorization: "Bearer " + getCookie(authTokenName),
+        },
+      }
+    );
+
+    return { data: res.data };
   } catch (err) {
     const error = err as AxiosError;
     return { error: error.response?.data };

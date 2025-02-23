@@ -2,10 +2,9 @@ import {
   useSearchUsers,
   useSearchUsersToCreateChat,
 } from "@/hooks/react-query";
-import { CreateChat } from "@/lib/validations";
+import { CreateChat, InviteUsersToChat } from "@/lib/validations";
 import { useState } from "react";
-import { UseFormSetValue } from "react-hook-form";
-import SearchUsersInput from "../chats/SearchUsersInput";
+import { FieldValues, Path, PathValue, UseFormSetValue } from "react-hook-form";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { FormControl } from "../ui/form";
 import { Button } from "../ui/button";
@@ -21,14 +20,19 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 
-type Props = {
+type Props<T extends FieldValues> = {
   value: number[] | undefined;
-  setValue: UseFormSetValue<CreateChat>;
+  setValue: UseFormSetValue<T>;
+  filtered?: number[];
 };
 
-const MultipleItemSelector = ({ value, setValue }: Props) => {
+const MultipleItemSelector = <T extends CreateChat | InviteUsersToChat>({
+  value,
+  setValue,
+  filtered,
+}: Props<T>) => {
   const [open, setOpen] = useState(false);
-  const { data: users } = useSearchUsers("");
+  const { data: users } = useSearchUsers("", filtered);
 
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
@@ -39,10 +43,10 @@ const MultipleItemSelector = ({ value, setValue }: Props) => {
   const handleRemoveUser = (name: string) => {
     if (!value) return;
     setValue(
-      "users",
+      "users" as Path<T>,
       value?.filter(
         (id) => id !== users?.data?.users.find((u) => u.name === name)?.id
-      )
+      ) as PathValue<T, Path<T>>
     );
     setSelectedUsers((prev) => prev.filter((n) => n !== name));
   };
@@ -83,8 +87,11 @@ const MultipleItemSelector = ({ value, setValue }: Props) => {
                     value={user.name}
                     onSelect={(name) => {
                       setValue(
-                        "users",
-                        value ? [...value, user.id] : [user.id]
+                        "users" as Path<T>,
+                        (value ? [...value, user.id] : [user.id]) as PathValue<
+                          T,
+                          Path<T>
+                        >
                       );
                       setSelectedUsers((prev) => [...prev, name]);
                       setOpen(false);

@@ -8,6 +8,7 @@ import {
   getChatMessages,
   getUserById,
   getUserChats,
+  inviteUsersToChat,
   loginUser,
   registerUser,
   searchUsers,
@@ -47,10 +48,10 @@ export const useFetchChatMessages = (chatId: number) => {
   });
 };
 
-export const useSearchUsers = (searchValue: string) => {
+export const useSearchUsers = (searchValue: string, filtered?: number[]) => {
   return useQuery({
     queryKey: ["searchUsers", searchValue],
-    queryFn: () => searchUsers(searchValue),
+    queryFn: () => searchUsers(searchValue, filtered),
   });
 };
 
@@ -161,5 +162,17 @@ export const useDeleteChatMessage = () => {
     //   );
     //   queryClient.invalidateQueries("chats");
     // },
+  });
+};
+
+export const useInviteUsersToChat = (chatId: number) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["inviteUsersToChat"],
+    mutationFn: (data: { users: number[]; chatId: number }) =>
+      inviteUsersToChat(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["chatInfo", chatId]);
+    },
   });
 };

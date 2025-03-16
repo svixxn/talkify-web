@@ -7,23 +7,20 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import ChatMessage from "./ChatMessage";
 import ChatDropdownMenu from "./ChatDropdownMenu";
-import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSocket } from "../shared/SocketProvider";
-import { ChatMessage as ChatMessageType } from "@/types";
 import { useQueryClient } from "react-query";
 import { ScrollArea } from "../ui/scroll-area";
 import { useUserContext } from "../shared/UserContext";
-import { Input } from "../ui/input";
 import { ResizablePanel } from "../ui/resizable";
 import { useChatContext } from "../shared/ChatContext";
 import { ArrowLeftFromLine, Sparkles, Users, X } from "lucide-react";
 import MainChatAreaLoader from "./MainChatAreaLoader";
 import { updateMessagesStatusOnNewMessage } from "@/lib/chats/helpers";
-import { cn, convertDateWithoutOffset } from "@/lib/utils";
 import ChatEmptyState from "../shared/ChatEmptyState";
-import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
+import { Dialog, DialogTrigger } from "../ui/dialog";
 import ChatInfoModal from "./ChatInfoModal";
-import UserInfoModal from "../shared/UserInfoModal";
+import UserInfoModal from "../profile/UserInfoModal";
 import ChatInput from "./ChatInput";
 
 type Props = {
@@ -34,16 +31,22 @@ type Props = {
 const MainChatArea = ({ currentChatId, screenSize }: Props) => {
   const { data: chatInfo, isLoading: isChatInfoLoading } =
     useFetchChatInfo(currentChatId);
+
   const { data: chatMessages, isLoading: isChatMessagesLoading } =
     useFetchChatMessages(currentChatId);
+
   const { user } = useUserContext();
+
   const [replyMessage, setReplyMessage] = useState<{
     id: number;
     content: string;
     sender: string;
   } | null>(null);
+
   const chatInputRef = useRef<HTMLInputElement>(null);
+
   const messagesAreaRef = useRef<HTMLDivElement>(null);
+
   const { setCurrentChatId } = useChatContext();
 
   const socket = useSocket();

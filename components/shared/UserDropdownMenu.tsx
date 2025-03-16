@@ -24,14 +24,17 @@ import axios from "axios";
 import { usePathname, useRouter } from "next/navigation";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import CreateChatModal from "../chats/CreateChatModal";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
+import UserInfoModal from "../profile/UserInfoModal";
+import { useUserContext } from "./UserContext";
 type Props = {
   username: string | undefined;
 };
 
 const UserDropdownMenu = ({ username }: Props) => {
-  const [modalOpen, setModalOpen] = useState(false);
+  const { user } = useUserContext();
+  const [createChatModalOpen, setCreateChatModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -40,8 +43,18 @@ const UserDropdownMenu = ({ username }: Props) => {
     router.replace("/");
   };
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      setCreateChatModalOpen(false);
+      setProfileModalOpen(false);
+    }
+  };
+
   return (
-    <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+    <Dialog
+      open={createChatModalOpen || profileModalOpen}
+      onOpenChange={handleOpenChange}
+    >
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline">
@@ -58,7 +71,7 @@ const UserDropdownMenu = ({ username }: Props) => {
                 <span>Chat</span>
               </DropdownMenuItem>
             ) : (
-              <DropdownMenuItem onClick={() => router.push("/home")}>
+              <DropdownMenuItem onClick={() => setProfileModalOpen(true)}>
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
@@ -71,7 +84,7 @@ const UserDropdownMenu = ({ username }: Props) => {
               <span>Search users</span>
             </DropdownMenuItem>
             <DialogTrigger asChild>
-              <DropdownMenuItem onClick={() => setModalOpen(true)}>
+              <DropdownMenuItem onClick={() => setCreateChatModalOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
                 <span>New Chat</span>
               </DropdownMenuItem>
@@ -84,8 +97,10 @@ const UserDropdownMenu = ({ username }: Props) => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <CreateChatModal setOpen={setModalOpen} />
+      {createChatModalOpen && (
+        <CreateChatModal setOpen={setCreateChatModalOpen} />
+      )}
+      {profileModalOpen && <UserInfoModal userId={user?.id || 0} />}
     </Dialog>
   );
 };

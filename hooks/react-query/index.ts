@@ -15,9 +15,10 @@ import {
   searchUsersToCreateChat,
   sendChatMessage,
   updateChat,
+  updateUser,
 } from "./functions";
 import { GeneralChatInfo, SignIn, SignUp } from "@/types";
-import { CreateChat } from "@/lib/validations";
+import { CreateChat, UpdateUser } from "@/lib/validations";
 
 export const useRegisterUser = () => {
   return useMutation({
@@ -59,6 +60,8 @@ export const useGetUserById = (userId: number) => {
   return useQuery({
     queryKey: ["getUserById", userId],
     queryFn: () => getUserById(userId),
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 };
 
@@ -173,6 +176,18 @@ export const useInviteUsersToChat = (chatId: number) => {
       inviteUsersToChat(data),
     onSuccess: () => {
       queryClient.invalidateQueries(["chatInfo", chatId]);
+    },
+  });
+};
+
+export const useUpdateUser = (userId: number) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["updateUser", userId],
+    mutationFn: (data: { userId: number; data: UpdateUser }) =>
+      updateUser(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["getUserById", userId]);
     },
   });
 };

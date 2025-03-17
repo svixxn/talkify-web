@@ -1,5 +1,5 @@
 import { uploadOne } from "@/lib/actions/cloudinary";
-import { CreateChat } from "@/lib/validations";
+import { CreateChat, UpdateUser } from "@/lib/validations";
 import {
   Chat,
   ChatMessage,
@@ -347,6 +347,28 @@ export const inviteUsersToChat = async (data: {
     const res = await axios.post(
       `${API_BASE_URL}/chats/${data.chatId}/invite`,
       { users: data.users },
+      {
+        headers: {
+          Authorization: "Bearer " + getCookie(authTokenName),
+        },
+      }
+    );
+
+    return { data: res.data };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { error: error.response?.data };
+  }
+};
+
+export const updateUser = async (data: {
+  userId: number;
+  data: UpdateUser;
+}): Promise<DefaultApiResponse<{ message: string }>> => {
+  try {
+    const res = await axios.put(
+      `${API_BASE_URL}/users/${data.userId}`,
+      { ...data.data },
       {
         headers: {
           Authorization: "Bearer " + getCookie(authTokenName),

@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { DialogContent } from "../ui/dialog";
+import { DialogContent, DialogTitle } from "../ui/dialog";
 
 type Props = {
   className?: string;
@@ -11,6 +11,7 @@ const CustomDialogContent = ({ className, children }: Props) => {
     <DialogContent
       className={cn(className, "bg-accent/20 backdrop-blur-sm border-accent")}
     >
+      <DialogTitle className="hidden"></DialogTitle>
       {children}
     </DialogContent>
   );

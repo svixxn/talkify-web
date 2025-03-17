@@ -25,8 +25,6 @@ export const CreateChatSchema = z
     }
   );
 
-export type CreateChat = z.infer<typeof CreateChatSchema>;
-
 export const SignUpSchema = z
   .object({
     email: z.string().email(),
@@ -54,4 +52,18 @@ export const InviteUsersToChatSchema = z.object({
   users: z.array(z.number()).min(1),
 });
 
+export const UpdateUserSChema = z.object({
+  name: z.string().optional(),
+  age: z.number().optional(),
+  email: z.string().email().optional(),
+  phone: z.string().optional(),
+  bio: z.string().optional(),
+  github: z.string().optional(),
+  twitter: z.string().optional(),
+  website: z.string().optional(),
+  avatar: z.string().optional(),
+});
+
 export type InviteUsersToChat = z.infer<typeof InviteUsersToChatSchema>;
+export type CreateChat = z.infer<typeof CreateChatSchema>;
+export type UpdateUser = z.infer<typeof UpdateUserSChema>;

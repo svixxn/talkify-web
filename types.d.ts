@@ -48,6 +48,7 @@ export type Message = {
   senderId: number;
   content: string;
   messageType: "text" | "image" | "video" | "audio" | "file";
+  isSystem: boolean;
 };
 
 export type GeneralChatInfo = {
@@ -74,6 +75,7 @@ export type ChatMessage = {
     sender: string;
   };
   files: string[];
+  isSystem: boolean;
 };
 
 //Users

@@ -23,7 +23,7 @@ import { useQueryClient } from "react-query";
 import { useSocket } from "../shared/SocketProvider";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
-import { Download, Reply } from "lucide-react";
+import { Bot, Download, Reply } from "lucide-react";
 import Image from "next/image";
 
 type Props = {
@@ -35,6 +35,7 @@ type Props = {
   chatId: number;
   senderName: string;
   files: string[];
+  isSystem: boolean;
   parentMessage?: {
     id: number;
     content: string;
@@ -55,6 +56,7 @@ const ChatMessage = ({
   senderName,
   parentMessage,
   files,
+  isSystem,
 }: Props) => {
   const { toast } = useToast();
   const { mutateAsync: deleteChatMessageAction } = useDeleteChatMessage();
@@ -98,6 +100,25 @@ const ChatMessage = ({
       return "";
     }
   };
+
+  if (isSystem) {
+    return (
+      <div className="flex flex-col items-center gap-2 my-8 px-4">
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 ring-2 ring-primary/20">
+          <Bot className="w-4 h-4 text-primary" />
+        </div>
+        <div className="relative max-w-lg mx-auto">
+          <div className="absolute inset-0 bg-gradient-to-r from-violet-500/10 via-fuchsia-500/10 to-violet-500/10 rounded-xl blur-xl" />
+          <div className="relative bg-black/40 backdrop-blur-sm rounded-xl px-6 py-4 text-center">
+            <p className="text-sm text-primary">{message}</p>
+            <span className="text-xs text-primary/60 mt-2 block">
+              {timestamp.getHours() + ":" + timestamp.getMinutes()}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

@@ -215,6 +215,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
                 parentMessage={message.parentMessage}
                 setReplyMessage={setReplyMessage}
                 isSystem={message.isSystem}
+                isGroup={chatInfo?.data?.chatInfo.isGroup!}
               />
             ))}
           </div>

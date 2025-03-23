@@ -36,6 +36,7 @@ type Props = {
   senderName: string;
   files: string[];
   isSystem: boolean;
+  isGroup: boolean;
   parentMessage?: {
     id: number;
     content: string;
@@ -57,6 +58,7 @@ const ChatMessage = ({
   parentMessage,
   files,
   isSystem,
+  isGroup,
 }: Props) => {
   const { toast } = useToast();
   const { mutateAsync: deleteChatMessageAction } = useDeleteChatMessage();
@@ -112,7 +114,9 @@ const ChatMessage = ({
           <div className="relative bg-black/40 backdrop-blur-sm rounded-xl px-6 py-4 text-center">
             <p className="text-sm text-primary">{message}</p>
             <span className="text-xs text-primary/60 mt-2 block">
-              {timestamp.getHours() + ":" + timestamp.getMinutes()}
+              {timestamp.getHours().toString().padStart(2, "0") +
+                ":" +
+                timestamp.getMinutes().toString().padStart(2, "0")}
             </span>
           </div>
         </div>
@@ -153,52 +157,69 @@ const ChatMessage = ({
                 </Avatar>
               )}
               <div className="flex flex-row max-w-[75%] items-center group gap-2">
-                <div
-                  className={`rounded-2xl flex items-center gap-2 ${
-                    isCurrentUserSender
-                      ? "message-own text-primary-foreground rounded-br-sm"
-                      : "message-system text-primary rounded-bl-sm"
-                  } text-sm`}
-                >
-                  <div className="flex flex-col">
-                    {files?.length > 0 && (
-                      <div
-                        className={`${
-                          files.length > 4 ? "grid grid-cols-4" : "flex"
-                        } gap-1 p-1`}
-                      >
-                        {files.map((file, index) => (
-                          <div key={index} className="relative group/image">
-                            <Image
-                              width={200}
-                              height={200}
-                              src={file}
-                              alt={file}
-                              className={cn(
-                                "max-h-[200px] object-cover",
-                                getImageClassnames(index)
-                              )}
-                            />
-                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/image:opacity-100 transition-opacity rounded-t-lg flex items-center justify-center">
-                              <Button
-                                variant="secondary"
-                                size="sm"
-                                className="gap-2"
-                                onClick={() => window.open(file, "_blank")}
-                              >
-                                <Download className="w-4 h-4" />
-                                Download
-                              </Button>
+                <div className="flex flex-col gap-1">
+                  <div
+                    className={`rounded-2xl flex items-center gap-2 ${
+                      isCurrentUserSender
+                        ? "message-own text-primary-foreground rounded-br-sm"
+                        : "message-system text-primary rounded-bl-sm"
+                    } text-sm`}
+                  >
+                    <div
+                      className={`flex flex-col ${message !== "" && "px-3"} `}
+                    >
+                      {!isCurrentUserSender && isGroup && (
+                        <div className="mb-1 pt-2">
+                          <span className="text-sm font-medium bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+                            {senderName}
+                          </span>
+                        </div>
+                      )}
+                      {files?.length > 0 && (
+                        <div
+                          className={`${
+                            files.length > 4 ? "grid grid-cols-4" : "flex"
+                          } gap-1`}
+                        >
+                          {files.map((file, index) => (
+                            <div key={index} className="relative group/image">
+                              <Image
+                                width={200}
+                                height={200}
+                                src={file}
+                                alt={file}
+                                className={cn(
+                                  "max-h-[200px] object-cover",
+                                  getImageClassnames(index)
+                                )}
+                              />
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/image:opacity-100 transition-opacity rounded-t-lg flex items-center justify-center">
+                                <Button
+                                  variant="secondary"
+                                  size="sm"
+                                  className="gap-2"
+                                  onClick={() => window.open(file, "_blank")}
+                                >
+                                  <Download className="w-4 h-4" />
+                                  Download
+                                </Button>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <p className="break-all">{message}</p>
+                        <span
+                          className={`text-[10px] opacity-80 ml-auto pt-3 ${
+                            message === "" && "pr-3"
+                          }`}
+                        >
+                          {timestamp.getHours().toString().padStart(2, "0") +
+                            ":" +
+                            timestamp.getMinutes().toString().padStart(2, "0")}
+                        </span>
                       </div>
-                    )}
-                    <div className="flex items-center gap-2">
-                      <p className="pl-2 py-2 break-all">{message}</p>
-                      <span className="text-[10px] opacity-80 mt-auto ml-auto p-1 pr-2">
-                        {timestamp.getHours() + ":" + timestamp.getMinutes()}
-                      </span>
                     </div>
                   </div>
                 </div>

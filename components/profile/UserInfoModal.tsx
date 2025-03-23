@@ -44,11 +44,11 @@ type Props = {
 const UserInfoModal = ({ userId }: Props) => {
   const { user } = useUserContext();
   const { toast } = useToast();
-  const { data, isError, isFetching } = useGetUserById(userId);
   const [isEditing, setIsEditing] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const { data, isError, isFetching } = useGetUserById(userId);
   const { mutateAsync: updateUserAction } = useUpdateUser(userId);
 
   const {

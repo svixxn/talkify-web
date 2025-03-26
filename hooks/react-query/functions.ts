@@ -6,6 +6,7 @@ import {
   ChatParticipant,
   DefaultApiResponse,
   GeneralChatInfo,
+  LocalMessage,
   SignIn,
   SignUp,
   User,
@@ -342,7 +343,9 @@ export const deleteChatMessage = async (data: {
 export const inviteUsersToChat = async (data: {
   users: number[];
   chatId: number;
-}): Promise<DefaultApiResponse<{ message: string }>> => {
+}): Promise<
+  DefaultApiResponse<{ message: string; systemMessage: LocalMessage }>
+> => {
   try {
     const res = await axios.post(
       `${API_BASE_URL}/chats/${data.chatId}/invite`,

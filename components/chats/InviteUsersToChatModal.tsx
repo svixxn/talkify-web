@@ -14,6 +14,7 @@ import {
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import MultipleItemSelector from "../shared/MultipleItemSelector";
+import { useSocket } from "../shared/SocketProvider";
 
 type Props = {
   chatId: number;
@@ -23,6 +24,7 @@ type Props = {
 
 const InviteUsersToChatModal = ({ chatId, participants, setOpen }: Props) => {
   const { toast } = useToast();
+  const socket = useSocket();
   const form = useForm<InviteUsersToChat>({
     resolver: zodResolver(InviteUsersToChatSchema),
     defaultValues: {
@@ -30,7 +32,10 @@ const InviteUsersToChatModal = ({ chatId, participants, setOpen }: Props) => {
     },
   });
 
-  const { mutateAsync: inviteUsersAction } = useInviteUsersToChat(chatId);
+  const { mutateAsync: inviteUsersAction } = useInviteUsersToChat(
+    chatId,
+    socket
+  );
 
   const onSubmit: SubmitHandler<InviteUsersToChat> = async (data) => {
     const res = await inviteUsersAction({ ...data, chatId });

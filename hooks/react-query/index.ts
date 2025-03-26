@@ -17,8 +17,10 @@ import {
   updateChat,
   updateUser,
 } from "./functions";
-import { GeneralChatInfo, SignIn, SignUp } from "@/types";
+import { SignUp } from "@/types";
 import { CreateChat, UpdateUser } from "@/lib/validations";
+import { updateMessagesStatusOnNewMessage } from "@/lib/chats/helpers";
+import { Socket } from "socket.io-client";
 
 export const useRegisterUser = () => {
   return useMutation({
@@ -168,14 +170,20 @@ export const useDeleteChatMessage = () => {
   });
 };
 
-export const useInviteUsersToChat = (chatId: number) => {
+export const useInviteUsersToChat = (chatId: number, socket: Socket | null) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["inviteUsersToChat"],
     mutationFn: (data: { users: number[]; chatId: number }) =>
       inviteUsersToChat(data),
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries(["chatInfo", chatId]);
+      updateMessagesStatusOnNewMessage(
+        queryClient,
+        chatId,
+        data.data?.systemMessage!
+      );
+      socket?.emit("chat-message", JSON.stringify(data.data?.systemMessage!));
     },
   });
 };

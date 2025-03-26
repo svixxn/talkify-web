@@ -59,6 +59,26 @@ export type GeneralChatInfo = {
   lastMessageDate: string | null;
 };
 
+export type LocalMessage = {
+  id: number;
+  createdAt: Date;
+  updatedAt: Date;
+  senderId: number;
+  chatId: number;
+  content: string;
+  messageType: string;
+  parentId: number | null;
+  files: string[];
+  isSystem: boolean;
+  senderAvatar?: string;
+  senderName?: string;
+  parentMessage?: {
+    id: number;
+    content: string;
+    sender: string;
+  } | null;
+};
+
 export type ChatMessage = {
   id: number;
   createdAt: string;

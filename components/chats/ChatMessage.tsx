@@ -25,6 +25,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Bot, Download, Reply } from "lucide-react";
 import Image from "next/image";
+import { Dialog, DialogTrigger } from "../ui/dialog";
+import UserInfoModal from "../profile/UserInfoModal";
 
 type Props = {
   id: number;
@@ -34,6 +36,7 @@ type Props = {
   avatar?: string;
   chatId: number;
   senderName: string;
+  senderId: number;
   files: string[];
   isSystem: boolean;
   isGroup: boolean;
@@ -59,6 +62,7 @@ const ChatMessage = ({
   files,
   isSystem,
   isGroup,
+  senderId,
 }: Props) => {
   const { toast } = useToast();
   const { mutateAsync: deleteChatMessageAction } = useDeleteChatMessage();
@@ -151,10 +155,18 @@ const ChatMessage = ({
               }`}
             >
               {!isCurrentUserSender && (
-                <Avatar className="h-10 w-10 border">
-                  <AvatarImage src={avatar} alt="Avatar" />
-                  <AvatarFallback>User</AvatarFallback>
-                </Avatar>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button>
+                      <Avatar className="h-10 w-10 border">
+                        <AvatarImage src={avatar} alt="Avatar" />
+                        <AvatarFallback>User</AvatarFallback>
+                      </Avatar>
+                    </button>
+                  </DialogTrigger>
+
+                  <UserInfoModal userId={senderId} />
+                </Dialog>
               )}
               <div className="flex flex-row max-w-[75%] items-center group gap-2">
                 <div className="flex flex-col gap-1">

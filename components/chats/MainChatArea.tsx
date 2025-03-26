@@ -95,6 +95,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
       parentId: replyMessage?.id || null,
       parentMessage: replyMessage,
       files: files || [],
+      isSystem: false,
     };
 
     updateMessagesStatusOnNewMessage(
@@ -216,6 +217,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
                 setReplyMessage={setReplyMessage}
                 isSystem={message.isSystem}
                 isGroup={chatInfo?.data?.chatInfo.isGroup!}
+                senderId={message.senderId}
               />
             ))}
           </div>

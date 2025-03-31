@@ -177,9 +177,7 @@ const ChatMessage = ({
                         : "message-system text-primary rounded-bl-sm"
                     } text-sm`}
                   >
-                    <div
-                      className={`flex flex-col ${message !== "" && "px-3"} `}
-                    >
+                    <div className={`flex flex-col px-3`}>
                       {!isCurrentUserSender && isGroup && (
                         <div className="mb-1 pt-2">
                           <span className="text-sm font-medium bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
@@ -194,14 +192,17 @@ const ChatMessage = ({
                           } gap-1`}
                         >
                           {files.map((file, index) => (
-                            <div key={index} className="relative group/image">
+                            <div
+                              key={index}
+                              className="relative group/image mt-3"
+                            >
                               <Image
-                                width={200}
-                                height={200}
+                                width={files.length > 1 ? 250 : 350}
+                                height={files.length > 1 ? 250 : 350}
                                 src={file}
                                 alt={file}
                                 className={cn(
-                                  "max-h-[200px] object-cover",
+                                  "max-h-[350px] object-fill",
                                   getImageClassnames(index)
                                 )}
                               />

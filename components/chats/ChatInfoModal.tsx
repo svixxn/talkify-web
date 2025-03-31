@@ -18,6 +18,7 @@ import {
   Twitter,
   UserPlus,
   Users,
+  UserX,
 } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,10 @@ import CustomDialogContent from "../shared/CustomDialogContent";
 import { Separator } from "../ui/separator";
 import InviteUsersToChatModal from "./InviteUsersToChatModal";
 import { useState } from "react";
+import { Checkbox } from "../ui/checkbox";
+import { useRemoveUsersFromChat } from "@/hooks/react-query";
+import { useSocket } from "../shared/SocketProvider";
+import { useToast } from "@/hooks/use-toast";
 
 type Props = {
   id: number;
@@ -46,6 +51,42 @@ const ChatInfoModal = ({
   participants,
 }: Props) => {
   const [open, setOpen] = useState(false);
+  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+
+  const { toast } = useToast();
+  const socket = useSocket();
+  const { mutateAsync: removeUsersFromChatAction, isLoading } =
+    useRemoveUsersFromChat(id, socket);
+
+  const handleMemberSelect = (memberId: number) => {
+    setSelectedMembers((prev) => {
+      if (prev.includes(memberId)) {
+        return prev.filter((id) => id !== memberId);
+      }
+      return [...prev, memberId];
+    });
+  };
+
+  const handleKickMembers = async () => {
+    const res = await removeUsersFromChatAction({
+      users: selectedMembers,
+      chatId: id,
+    });
+
+    if (res.error) {
+      toast({
+        title: `An error occurred: ${res.error.message}`,
+      });
+      return;
+    }
+
+    toast({
+      title: `Users were successfully removed from the chat`,
+    });
+
+    setSelectedMembers([]);
+  };
+
   return (
     <CustomDialogContent>
       <DialogHeader>
@@ -87,7 +128,6 @@ const ChatInfoModal = ({
           </div>
         )}
 
-        {/* Members */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -96,24 +136,38 @@ const ChatInfoModal = ({
                 {participants?.length}
               </span>
             </div>
-            <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger asChild>
+            <div className="flex flex-row gap-2">
+              {selectedMembers.length > 0 && (
                 <Button
-                  onClick={() => setOpen(true)}
-                  variant="outline"
+                  variant="destructive"
                   size="sm"
+                  onClick={handleKickMembers}
                   className="gap-2"
+                  disabled={isLoading}
                 >
-                  <UserPlus className="w-4 h-4" />
-                  Add Member
+                  <UserX className="w-4 h-4" />
+                  Kick ({selectedMembers.length})
                 </Button>
-              </DialogTrigger>
-              <InviteUsersToChatModal
-                chatId={id}
-                participants={participants.map((user) => user.id)}
-                setOpen={setOpen}
-              />
-            </Dialog>
+              )}
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    onClick={() => setOpen(true)}
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    Add Member
+                  </Button>
+                </DialogTrigger>
+                <InviteUsersToChatModal
+                  chatId={id}
+                  participants={participants.map((user) => user.id)}
+                  setOpen={setOpen}
+                />
+              </Dialog>
+            </div>
           </div>
 
           <ScrollArea className="h-[200px] pr-4">
@@ -121,8 +175,20 @@ const ChatInfoModal = ({
               {participants?.map((member) => (
                 <div
                   key={member.id}
-                  className="flex items-center gap-3 p-2 rounded-lg"
+                  className={cn(
+                    "flex items-center gap-3 p-2 rounded-lg transition-colors",
+                    selectedMembers.includes(member.id)
+                      ? "bg-accent/50"
+                      : "hover:bg-accent/30",
+                    "group"
+                  )}
                 >
+                  <Checkbox
+                    checked={selectedMembers.includes(member.id)}
+                    onCheckedChange={() => handleMemberSelect(member.id)}
+                    disabled={member.role === "admin"}
+                    className="data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                  />
                   <div className="relative">
                     <Avatar className="h-10 w-10 border">
                       <AvatarImage src={member.avatar || ""} alt="Avatar" />

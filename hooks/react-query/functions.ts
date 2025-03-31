@@ -347,8 +347,32 @@ export const inviteUsersToChat = async (data: {
   DefaultApiResponse<{ message: string; systemMessage: LocalMessage }>
 > => {
   try {
+    const res = await axios.patch(
+      `${API_BASE_URL}/chats/${data.chatId}/members`,
+      { users: data.users },
+      {
+        headers: {
+          Authorization: "Bearer " + getCookie(authTokenName),
+        },
+      }
+    );
+
+    return { data: res.data };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { error: error.response?.data };
+  }
+};
+
+export const removeUsersFromChat = async (data: {
+  users: number[];
+  chatId: number;
+}): Promise<
+  DefaultApiResponse<{ message: string; systemMessage: LocalMessage }>
+> => {
+  try {
     const res = await axios.post(
-      `${API_BASE_URL}/chats/${data.chatId}/invite`,
+      `${API_BASE_URL}/chats/${data.chatId}/members`,
       { users: data.users },
       {
         headers: {

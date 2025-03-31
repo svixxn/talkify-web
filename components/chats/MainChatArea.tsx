@@ -58,7 +58,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
     if (messagesAreaRef.current) {
       messagesAreaRef.current.scrollIntoView({
         block: "end",
-        behavior: "smooth",
+        behavior: "instant",
       });
     }
   }, []);

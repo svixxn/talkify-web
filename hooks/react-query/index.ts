@@ -11,6 +11,7 @@ import {
   inviteUsersToChat,
   loginUser,
   registerUser,
+  removeUsersFromChat,
   searchUsers,
   searchUsersToCreateChat,
   sendChatMessage,
@@ -176,6 +177,27 @@ export const useInviteUsersToChat = (chatId: number, socket: Socket | null) => {
     mutationKey: ["inviteUsersToChat"],
     mutationFn: (data: { users: number[]; chatId: number }) =>
       inviteUsersToChat(data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(["chatInfo", chatId]);
+      updateMessagesStatusOnNewMessage(
+        queryClient,
+        chatId,
+        data.data?.systemMessage!
+      );
+      socket?.emit("chat-message", JSON.stringify(data.data?.systemMessage!));
+    },
+  });
+};
+
+export const useRemoveUsersFromChat = (
+  chatId: number,
+  socket: Socket | null
+) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["removeUsersToChat"],
+    mutationFn: (data: { users: number[]; chatId: number }) =>
+      removeUsersFromChat(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries(["chatInfo", chatId]);
       updateMessagesStatusOnNewMessage(

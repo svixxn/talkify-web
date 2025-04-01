@@ -78,7 +78,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
   }, [replyMessage]);
 
   const handleSendMessage = async (message?: string, files?: string[]) => {
-    if ((!message && !files) || !socket || !user) return;
+    if ((!message && files?.length === 0) || !socket || !user) return;
 
     const id = Math.floor(Math.random() * 1000000);
 

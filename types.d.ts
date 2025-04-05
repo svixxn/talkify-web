@@ -96,6 +96,7 @@ export type ChatMessage = {
   };
   files: string[];
   isSystem: boolean;
+  isPinned: boolean;
 };
 
 //Users

@@ -14,7 +14,7 @@ import { ScrollArea } from "../ui/scroll-area";
 import { useUserContext } from "../shared/UserContext";
 import { ResizablePanel } from "../ui/resizable";
 import { useChatContext } from "../shared/ChatContext";
-import { ArrowLeftFromLine, Sparkles, Users, X } from "lucide-react";
+import { ArrowLeftFromLine, Pin, Sparkles, Users, X } from "lucide-react";
 import MainChatAreaLoader from "./MainChatAreaLoader";
 import { updateMessagesStatusOnNewMessage } from "@/lib/chats/helpers";
 import ChatEmptyState from "../shared/ChatEmptyState";
@@ -35,7 +35,17 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
   const { data: chatMessages, isLoading: isChatMessagesLoading } =
     useFetchChatMessages(currentChatId);
 
+  const { mutateAsync: sendMessage } = useSendMessage();
+
+  const { setCurrentChatId } = useChatContext();
   const { user } = useUserContext();
+
+  const socket = useSocket();
+  const queryClient = useQueryClient();
+
+  const pinnedMessage = chatMessages?.data
+    ?.filter((message) => message.isPinned)
+    .reverse()[0];
 
   const [replyMessage, setReplyMessage] = useState<{
     id: number;
@@ -46,13 +56,6 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
   const chatInputRef = useRef<HTMLInputElement>(null);
 
   const messagesAreaRef = useRef<HTMLDivElement>(null);
-
-  const { setCurrentChatId } = useChatContext();
-
-  const socket = useSocket();
-  const queryClient = useQueryClient();
-
-  const { mutateAsync: sendMessage } = useSendMessage();
 
   const scrollToBottom = useCallback(() => {
     if (messagesAreaRef.current) {
@@ -80,10 +83,8 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
   const handleSendMessage = async (message?: string, files?: string[]) => {
     if ((!message && files?.length === 0) || !socket || !user) return;
 
-    const id = Math.floor(Math.random() * 1000000);
-
     const newMessageLocal = {
-      id,
+      id: Math.floor(Math.random() * 1000000),
       createdAt: new Date(),
       updatedAt: new Date(),
       senderId: user.id,
@@ -120,6 +121,17 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
 
   const onCancelReply = () => {
     setReplyMessage(null);
+  };
+
+  const scrollToMessage = (messageId: number) => {
+    const element = document.getElementById(`message-${messageId}`);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+      element.classList.add("bg-primary/10");
+      setTimeout(() => {
+        element.classList.remove("bg-primary/10");
+      }, 1000);
+    }
   };
 
   if (isChatInfoLoading || isChatMessagesLoading) {
@@ -193,6 +205,46 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
         </div>
       </div>
 
+      {pinnedMessage && (
+        <div className="border-b border-accent bg-black/10">
+          <div className="p-2">
+            <div className="flex items-center gap-2 px-2 py-1">
+              <Pin className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">
+                pinned message
+              </span>
+            </div>
+            <div className="space-y-2">
+              <button
+                key={`pinned-${pinnedMessage.id}`}
+                onClick={() => scrollToMessage(pinnedMessage.id)}
+                className="w-full p-2 rounded-lg bg-accent/20 hover:bg-accent/30 transition-colors text-left"
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium text-primary">
+                    {pinnedMessage.senderName}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(pinnedMessage.createdAt)
+                      .getHours()
+                      .toString()
+                      .padStart(2, "0") +
+                      ":" +
+                      new Date(pinnedMessage.createdAt)
+                        .getMinutes()
+                        .toString()
+                        .padStart(2, "0")}
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground line-clamp-1">
+                  {pinnedMessage.content}
+                </p>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {chatMessages?.data?.length === 0 ? (
         <ChatEmptyState
           title="No messages yet"
@@ -218,6 +270,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
                 isSystem={message.isSystem}
                 isGroup={chatInfo?.data?.chatInfo.isGroup!}
                 senderId={message.senderId}
+                isPinned={message.isPinned}
               />
             ))}
           </div>
@@ -233,25 +286,5 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
     </ResizablePanel>
   );
 };
-
-function SendIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m22 2-7 20-4-9-9-4Z" />
-      <path d="M22 2 11 13" />
-    </svg>
-  );
-}
 
 export default MainChatArea;

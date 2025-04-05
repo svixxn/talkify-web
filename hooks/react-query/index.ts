@@ -10,6 +10,7 @@ import {
   getUserChats,
   inviteUsersToChat,
   loginUser,
+  pinMessage,
   registerUser,
   removeUsersFromChat,
   searchUsers,
@@ -168,6 +169,18 @@ export const useDeleteChatMessage = () => {
     //   );
     //   queryClient.invalidateQueries("chats");
     // },
+  });
+};
+
+export const usePinMessage = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["pinMessage"],
+    mutationFn: (data: { messageId: number; chatId: number }) =>
+      pinMessage(data),
+    onSuccess: (data) => {
+      // queryClient.invalidateQueries(["chatInfo", data.data?.chatId]);
+    },
   });
 };
 

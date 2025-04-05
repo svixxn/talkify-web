@@ -409,3 +409,25 @@ export const updateUser = async (data: {
     return { error: error.response?.data };
   }
 };
+
+export const pinMessage = async (data: {
+  messageId: number;
+  chatId: number;
+}): Promise<DefaultApiResponse<{ message: string }>> => {
+  try {
+    const res = await axios.post(
+      `${API_BASE_URL}/chats/${data.chatId}/messages/${data.messageId}/pin`,
+      {},
+      {
+        headers: {
+          Authorization: "Bearer " + getCookie(authTokenName),
+        },
+      }
+    );
+
+    return { data: res.data };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { error: error.response?.data };
+  }
+};

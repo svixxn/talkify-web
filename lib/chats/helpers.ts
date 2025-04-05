@@ -98,3 +98,27 @@ export function updateMessagesStatusOnDeleteMessage(
     return oldData;
   });
 }
+
+export function updateMessageStatusOnPinMessage(
+  queryClient: QueryClient,
+  chatId: number,
+  messageId: number,
+  isPinned: boolean
+) {
+  queryClient.setQueryData(["chatMessages", chatId], (oldData: any) => {
+    const messageIndex = oldData.data.findIndex(
+      (message: any) => message.id === messageId
+    );
+
+    const newData = [...oldData.data];
+
+    newData[messageIndex] = {
+      ...newData[messageIndex],
+      isPinned,
+    };
+
+    return {
+      data: newData,
+    };
+  });
+}

@@ -1,4 +1,4 @@
-import { useDeleteChatMessage } from "@/hooks/react-query";
+import { useDeleteChatMessage, usePinMessage } from "@/hooks/react-query";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,12 +18,15 @@ import {
   ContextMenuTrigger,
 } from "../ui/context-menu";
 import { useToast } from "@/hooks/use-toast";
-import { updateMessagesStatusOnDeleteMessage } from "@/lib/chats/helpers";
+import {
+  updateMessagesStatusOnDeleteMessage,
+  updateMessageStatusOnPinMessage,
+} from "@/lib/chats/helpers";
 import { useQueryClient } from "react-query";
 import { useSocket } from "../shared/SocketProvider";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
-import { Bot, Download, Reply } from "lucide-react";
+import { Bot, Download, Pin, Reply, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import UserInfoModal from "../profile/UserInfoModal";
@@ -40,6 +43,7 @@ type Props = {
   files: string[];
   isSystem: boolean;
   isGroup: boolean;
+  isPinned: boolean;
   parentMessage?: {
     id: number;
     content: string;
@@ -66,6 +70,7 @@ const ChatMessage = ({
 }: Props) => {
   const { toast } = useToast();
   const { mutateAsync: deleteChatMessageAction } = useDeleteChatMessage();
+  const { mutateAsync: pinMessageAction } = usePinMessage();
   const queryClient = useQueryClient();
   const socket = useSocket();
 
@@ -76,6 +81,18 @@ const ChatMessage = ({
     if (res.error) {
       toast({
         title: "An error occurred while deleting the message",
+      });
+      return;
+    }
+  };
+
+  const handlePinMessage = async () => {
+    updateMessageStatusOnPinMessage(queryClient, chatId, id, true);
+    socket?.emit("pin-message", JSON.stringify({ chatId, messageId: id }));
+    const res = await pinMessageAction({ messageId: id, chatId });
+    if (res.error) {
+      toast({
+        title: "An error occurred while pinning the message",
       });
       return;
     }
@@ -150,7 +167,8 @@ const ChatMessage = ({
         <ContextMenu>
           <ContextMenuTrigger>
             <div
-              className={`flex items-start gap-3 ${
+              id={`message-${id}`}
+              className={`flex items-start rounded-2xl transition-all gap-3 ${
                 isCurrentUserSender && "justify-end"
               }`}
             >
@@ -249,8 +267,18 @@ const ChatMessage = ({
           </ContextMenuTrigger>
           <ContextMenuContent>
             <AlertDialogTrigger className="w-full">
-              <ContextMenuItem className="text-red-500">Delete</ContextMenuItem>
+              <ContextMenuItem className="text-red-500 flex flex-row gap-2">
+                <Trash2 size={16} />
+                <span>Delete</span>
+              </ContextMenuItem>
             </AlertDialogTrigger>
+            <ContextMenuItem
+              className="flex flex-row gap-2"
+              onClick={handlePinMessage}
+            >
+              <Pin size={16} />
+              <span>Pin</span>
+            </ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
 

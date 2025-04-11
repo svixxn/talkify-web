@@ -10,7 +10,7 @@ import { SignIn, SignUp } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SignInSchema, SignUpSchema } from "@/lib/validations";
 import axios from "axios";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
 import { useRegisterUser } from "@/hooks/react-query";
 
 const SignUpTab = () => {

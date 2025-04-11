@@ -244,7 +244,9 @@ export const sendChatMessage = async (data: {
 
 export const getChatMessages = async (
   chatId: number
-): Promise<DefaultApiResponse<ChatMessage[]>> => {
+): Promise<
+  DefaultApiResponse<{ messages: ChatMessage[]; pinnedMessage: ChatMessage }>
+> => {
   try {
     const res = await axios.get(`${API_BASE_URL}/chats/${chatId}/messages`, {
       headers: {
@@ -252,7 +254,12 @@ export const getChatMessages = async (
       },
     });
 
-    return { data: res.data.messages };
+    return {
+      data: {
+        messages: res.data.messages,
+        pinnedMessage: res.data.pinnedMessage,
+      },
+    };
   } catch (err) {
     const error = err as AxiosError;
     return { error: error.response?.data };
@@ -413,7 +420,9 @@ export const updateUser = async (data: {
 export const pinMessage = async (data: {
   messageId: number;
   chatId: number;
-}): Promise<DefaultApiResponse<{ message: string }>> => {
+}): Promise<
+  DefaultApiResponse<{ message: string; systemMessage?: LocalMessage }>
+> => {
   try {
     const res = await axios.post(
       `${API_BASE_URL}/chats/${data.chatId}/messages/${data.messageId}/pin`,

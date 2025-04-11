@@ -1,14 +1,21 @@
 import { useSocket } from "@/components/shared/SocketProvider";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useQueryClient } from "react-query";
-import { useToast } from "./use-toast";
+import { useToast } from "./useToast";
 import { DefaultApiResponse, GeneralChatInfo } from "@/types";
 import { useChatContext } from "@/components/shared/ChatContext";
 import useScreenSize from "./useScreenWidth";
 import {
   updateMessagesStatusOnDeleteMessage,
   updateMessagesStatusOnNewMessage,
-} from "@/lib/chats/helpers";
+  updateMessagesStatusOnPinMessage,
+} from "@/lib/websocket/chats";
+import {
+  handleDeletedChat,
+  handleDeleteMessage,
+  handlePinMessage,
+  handleReceivedMessage,
+} from "@/lib/websocket/eventHandlers";
 
 type UseChatSocketHandlerProps = {
   previousDataLength: number;
@@ -24,48 +31,30 @@ export const useChatSocketHandler = ({
   const { toast } = useToast();
   const socket = useSocket();
   const queryClient = useQueryClient();
+  const areEventsInitialized = useRef(false);
 
   const { hasJoinedChats, setHasJoinedChats, currentChatId, setCurrentChatId } =
     useChatContext();
 
   useEffect(() => {
-    if (socket) {
-      const handleReceivedMessage = (newChatData: string) => {
-        const parsedData = JSON.parse(newChatData);
-        updateMessagesStatusOnNewMessage(
-          queryClient,
-          parsedData.chatId,
-          parsedData
-        );
-      };
+    if (socket && !areEventsInitialized.current) {
+      areEventsInitialized.current = true;
+      socket.on("received-message", (newChatData) =>
+        handleReceivedMessage(queryClient, newChatData)
+      );
 
-      const handleDeletedChat = (chatId: number) => {
+      socket.on("delete-chat", (chatId) => {
         if (chatId === currentChatId) setCurrentChatId(null);
+        handleDeletedChat(queryClient, chatId);
+      });
 
-        queryClient.setQueryData(
-          ["chats", { searchValue: "" }],
-          (oldData: any) => {
-            return {
-              data: oldData.data.filter((chat: any) => chat.chatId !== chatId),
-            };
-          }
-        );
-      };
+      socket.on("delete-message", (newChatData) =>
+        handleDeleteMessage(queryClient, newChatData)
+      );
 
-      const handleDeleteMessage = (newChatData: string) => {
-        const parsedData: { chatId: number; messageId: number } =
-          JSON.parse(newChatData);
-        //TODO: reimplement this function so if suer hasnt fetched the messages yet, it doesnt break
-        updateMessagesStatusOnDeleteMessage(
-          queryClient,
-          parsedData.chatId,
-          parsedData.messageId
-        );
-      };
-
-      socket.on("received-message", handleReceivedMessage);
-      socket.on("delete-chat", handleDeletedChat);
-      socket.on("delete-message", handleDeleteMessage);
+      socket.on("pin-message", (newChatData) =>
+        handlePinMessage(queryClient, newChatData)
+      );
 
       return () => {
         socket.off("received-message", handleReceivedMessage);

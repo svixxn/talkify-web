@@ -35,7 +35,7 @@ import { Switch } from "../ui/switch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UpdateUser, UpdateUserSChema } from "@/lib/validations";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
 
 type Props = {
   userId: number;

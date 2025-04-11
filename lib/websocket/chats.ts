@@ -7,8 +7,12 @@ export function updateMessagesStatusOnNewMessage(
   message: LocalMessage
 ) {
   queryClient.setQueryData(["chatMessages", chatId], (oldData: any) => {
+    console.log("oldData", oldData);
     return {
-      data: [...(oldData?.data || []), message],
+      data: {
+        messages: [...(oldData?.data.messages || []), message],
+        pinnedMessage: oldData?.data.pinnedMessage || null,
+      },
     };
   });
 
@@ -45,23 +49,22 @@ export function updateMessagesStatusOnDeleteMessage(
   let previousMessageInfo: { lastMessage: string; lastMessageDate: Date };
 
   queryClient.setQueryData(["chatMessages", chatId], (oldData: any) => {
-    const messageIndex = oldData.data.findIndex(
-      (message: any) => message.id === messageId
-    );
-
-    const newData = oldData.data.filter(
+    const newData = oldData.data.messages.filter(
       (message: any) => message.id !== messageId
     );
 
     if (newData.length > 0) {
       previousMessageInfo = {
-        lastMessage: oldData.data[messageIndex - 1].content,
-        lastMessageDate: oldData.data[messageIndex - 1].createdAt,
+        lastMessage: newData[newData.length - 1].content,
+        lastMessageDate: newData[newData.length - 1].createdAt,
       };
     }
 
     return {
-      data: newData,
+      data: {
+        messages: newData,
+        pinnedMessage: oldData.data.pinnedMessage,
+      },
     };
   });
 
@@ -99,26 +102,31 @@ export function updateMessagesStatusOnDeleteMessage(
   });
 }
 
-export function updateMessageStatusOnPinMessage(
+export function updateMessagesStatusOnPinMessage(
   queryClient: QueryClient,
   chatId: number,
   messageId: number,
   isPinned: boolean
 ) {
   queryClient.setQueryData(["chatMessages", chatId], (oldData: any) => {
-    const messageIndex = oldData.data.findIndex(
+    const messageIndex = oldData.data.messages.findIndex(
       (message: any) => message.id === messageId
     );
 
-    const newData = [...oldData.data];
+    const newData = [...oldData.data.messages];
 
     newData[messageIndex] = {
       ...newData[messageIndex],
       isPinned,
     };
 
+    // TODO: set the previous pinned message if current one is unpinning
+
     return {
-      data: newData,
+      data: {
+        messages: newData,
+        pinnedMessage: isPinned ? newData[messageIndex] : null,
+      },
     };
   });
 }

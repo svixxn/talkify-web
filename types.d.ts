@@ -40,17 +40,6 @@ export type Chat = {
   isDeleted: boolean;
 };
 
-export type Message = {
-  id: number;
-  createdAt: Date;
-  updatedAt: Date;
-  chatId: number;
-  senderId: number;
-  content: string;
-  messageType: "text" | "image" | "video" | "audio" | "file";
-  isSystem: boolean;
-};
-
 export type GeneralChatInfo = {
   chatId: number;
   name: string;
@@ -97,6 +86,7 @@ export type ChatMessage = {
   files: string[];
   isSystem: boolean;
   isPinned: boolean;
+  pinnedAt: Date | null;
 };
 
 //Users

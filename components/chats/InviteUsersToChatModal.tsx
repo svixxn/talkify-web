@@ -1,5 +1,5 @@
 import { useInviteUsersToChat } from "@/hooks/react-query";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
 import { InviteUsersToChat, InviteUsersToChatSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";

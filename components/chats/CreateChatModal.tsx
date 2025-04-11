@@ -27,7 +27,7 @@ import { CreateChat, CreateChatSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { useCreateChat } from "@/hooks/react-query";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
 import MultipleItemSelector from "../shared/MultipleItemSelector";
 import { useChatContext } from "../shared/ChatContext";
 import CustomDialogContent from "../shared/CustomDialogContent";

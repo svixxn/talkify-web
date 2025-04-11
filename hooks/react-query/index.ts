@@ -21,7 +21,7 @@ import {
 } from "./functions";
 import { SignUp } from "@/types";
 import { CreateChat, UpdateUser } from "@/lib/validations";
-import { updateMessagesStatusOnNewMessage } from "@/lib/chats/helpers";
+import { updateMessagesStatusOnNewMessage } from "@/lib/websocket/chats";
 import { Socket } from "socket.io-client";
 
 export const useRegisterUser = () => {
@@ -172,14 +172,21 @@ export const useDeleteChatMessage = () => {
   });
 };
 
-export const usePinMessage = () => {
+export const usePinMessage = (chatId: number, socket: Socket | null) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["pinMessage"],
     mutationFn: (data: { messageId: number; chatId: number }) =>
       pinMessage(data),
     onSuccess: (data) => {
-      // queryClient.invalidateQueries(["chatInfo", data.data?.chatId]);
+      if (!data.data?.systemMessage) return;
+
+      updateMessagesStatusOnNewMessage(
+        queryClient,
+        chatId,
+        data.data?.systemMessage
+      );
+      socket?.emit("chat-message", JSON.stringify(data.data?.systemMessage!));
     },
   });
 };

@@ -17,11 +17,11 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "../ui/context-menu";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
 import {
   updateMessagesStatusOnDeleteMessage,
-  updateMessageStatusOnPinMessage,
-} from "@/lib/chats/helpers";
+  updateMessagesStatusOnPinMessage,
+} from "@/lib/websocket/chats";
 import { useQueryClient } from "react-query";
 import { useSocket } from "../shared/SocketProvider";
 import { cn } from "@/lib/utils";
@@ -67,14 +67,15 @@ const ChatMessage = ({
   isSystem,
   isGroup,
   senderId,
+  isPinned,
 }: Props) => {
   const { toast } = useToast();
   const { mutateAsync: deleteChatMessageAction } = useDeleteChatMessage();
-  const { mutateAsync: pinMessageAction } = usePinMessage();
   const queryClient = useQueryClient();
   const socket = useSocket();
+  const { mutateAsync: pinMessageAction } = usePinMessage(chatId, socket);
 
-  const handleDeleteFunction = async () => {
+  const handleDeleteMessage = async () => {
     updateMessagesStatusOnDeleteMessage(queryClient, chatId, id);
     socket?.emit("delete-message", JSON.stringify({ chatId, messageId: id }));
     const res = await deleteChatMessageAction({ messageId: id, chatId });
@@ -87,8 +88,11 @@ const ChatMessage = ({
   };
 
   const handlePinMessage = async () => {
-    updateMessageStatusOnPinMessage(queryClient, chatId, id, true);
-    socket?.emit("pin-message", JSON.stringify({ chatId, messageId: id }));
+    updateMessagesStatusOnPinMessage(queryClient, chatId, id, !isPinned);
+    socket?.emit(
+      "pin-message",
+      JSON.stringify({ chatId, messageId: id, isPinned: !isPinned })
+    );
     const res = await pinMessageAction({ messageId: id, chatId });
     if (res.error) {
       toast({
@@ -277,7 +281,7 @@ const ChatMessage = ({
               onClick={handlePinMessage}
             >
               <Pin size={16} />
-              <span>Pin</span>
+              <span>{isPinned ? "Unpin" : "Pin"}</span>
             </ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
@@ -292,7 +296,7 @@ const ChatMessage = ({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteFunction}>
+            <AlertDialogAction onClick={handleDeleteMessage}>
               Continue
             </AlertDialogAction>
           </AlertDialogFooter>

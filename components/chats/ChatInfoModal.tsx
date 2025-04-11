@@ -33,7 +33,7 @@ import { useState } from "react";
 import { Checkbox } from "../ui/checkbox";
 import { useRemoveUsersFromChat } from "@/hooks/react-query";
 import { useSocket } from "../shared/SocketProvider";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
 
 type Props = {
   id: number;

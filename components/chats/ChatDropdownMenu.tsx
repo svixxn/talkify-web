@@ -32,7 +32,7 @@ import {
 } from "../ui/alert-dialog";
 import { useState } from "react";
 import { useClearChatHistory, useDeleteChat } from "@/hooks/react-query";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
 import { useChatContext } from "../shared/ChatContext";
 import { useSocket } from "../shared/SocketProvider";
 

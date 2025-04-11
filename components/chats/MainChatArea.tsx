@@ -16,7 +16,7 @@ import { ResizablePanel } from "../ui/resizable";
 import { useChatContext } from "../shared/ChatContext";
 import { ArrowLeftFromLine, Pin, Sparkles, Users, X } from "lucide-react";
 import MainChatAreaLoader from "./MainChatAreaLoader";
-import { updateMessagesStatusOnNewMessage } from "@/lib/chats/helpers";
+import { updateMessagesStatusOnNewMessage } from "@/lib/websocket/chats";
 import ChatEmptyState from "../shared/ChatEmptyState";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import ChatInfoModal from "./ChatInfoModal";
@@ -42,10 +42,6 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
 
   const socket = useSocket();
   const queryClient = useQueryClient();
-
-  const pinnedMessage = chatMessages?.data
-    ?.filter((message) => message.isPinned)
-    .reverse()[0];
 
   const [replyMessage, setReplyMessage] = useState<{
     id: number;
@@ -97,6 +93,8 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
       parentMessage: replyMessage,
       files: files || [],
       isSystem: false,
+      isPinned: false,
+      pinnedAt: null,
     };
 
     updateMessagesStatusOnNewMessage(
@@ -205,7 +203,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
         </div>
       </div>
 
-      {pinnedMessage && (
+      {chatMessages?.data?.pinnedMessage && (
         <div className="border-b border-accent bg-black/10">
           <div className="p-2">
             <div className="flex items-center gap-2 px-2 py-1">
@@ -216,28 +214,30 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
             </div>
             <div className="space-y-2">
               <button
-                key={`pinned-${pinnedMessage.id}`}
-                onClick={() => scrollToMessage(pinnedMessage.id)}
+                key={`pinned-${chatMessages?.data?.pinnedMessage.id}`}
+                onClick={() =>
+                  scrollToMessage(chatMessages?.data?.pinnedMessage.id!)
+                }
                 className="w-full p-2 rounded-lg bg-accent/20 hover:bg-accent/30 transition-colors text-left"
               >
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm font-medium text-primary">
-                    {pinnedMessage.senderName}
+                    {chatMessages?.data?.pinnedMessage.senderName}
                   </span>
                   <span className="text-xs text-muted-foreground">
-                    {new Date(pinnedMessage.createdAt)
+                    {new Date(chatMessages?.data?.pinnedMessage.createdAt)
                       .getHours()
                       .toString()
                       .padStart(2, "0") +
                       ":" +
-                      new Date(pinnedMessage.createdAt)
+                      new Date(chatMessages?.data?.pinnedMessage.createdAt)
                         .getMinutes()
                         .toString()
                         .padStart(2, "0")}
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground line-clamp-1">
-                  {pinnedMessage.content}
+                  {chatMessages?.data?.pinnedMessage.content}
                 </p>
               </button>
             </div>
@@ -245,7 +245,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
         </div>
       )}
 
-      {chatMessages?.data?.length === 0 ? (
+      {chatMessages?.data?.messages.length === 0 ? (
         <ChatEmptyState
           title="No messages yet"
           icon={<Sparkles className="w-10 h-10 animate-pulse" />}
@@ -254,7 +254,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
       ) : (
         <ScrollArea className="p-4 h-screen">
           <div ref={messagesAreaRef} className="grid gap-4">
-            {chatMessages?.data?.map((message) => (
+            {chatMessages?.data?.messages.map((message) => (
               <ChatMessage
                 files={message.files}
                 id={message.id}

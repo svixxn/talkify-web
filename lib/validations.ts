@@ -61,9 +61,14 @@ export const UpdateUserSChema = z.object({
   github: z.string().optional(),
   twitter: z.string().optional(),
   website: z.string().optional(),
-  avatar: z.string().optional(),
+  avatar: z.string().optional().nullable(),
+});
+
+export const UpdateChatMemberSchema = z.object({
+  role: z.enum(["admin", "moderator", "user"]).optional(),
 });
 
 export type InviteUsersToChat = z.infer<typeof InviteUsersToChatSchema>;
 export type CreateChat = z.infer<typeof CreateChatSchema>;
 export type UpdateUser = z.infer<typeof UpdateUserSChema>;
+export type UpdateChatMember = z.infer<typeof UpdateChatMemberSchema>;

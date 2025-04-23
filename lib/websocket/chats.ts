@@ -120,8 +120,6 @@ export function updateMessagesStatusOnPinMessage(
       isPinned,
     };
 
-    // TODO: set the previous pinned message if current one is unpinning
-
     return {
       data: {
         messages: newData,

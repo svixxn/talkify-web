@@ -17,10 +17,11 @@ import {
   searchUsersToCreateChat,
   sendChatMessage,
   updateChat,
+  updateChatMember,
   updateUser,
 } from "./functions";
 import { SignUp } from "@/types";
-import { CreateChat, UpdateUser } from "@/lib/validations";
+import { CreateChat, UpdateChatMember, UpdateUser } from "@/lib/validations";
 import { updateMessagesStatusOnNewMessage } from "@/lib/websocket/chats";
 import { Socket } from "socket.io-client";
 
@@ -238,6 +239,21 @@ export const useUpdateUser = (userId: number) => {
       updateUser(data),
     onSuccess: () => {
       queryClient.invalidateQueries(["getUserById", userId]);
+    },
+  });
+};
+
+export const useUpdateChatMember = (memberId: number, chatId: number) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["updateChatMember", memberId, chatId],
+    mutationFn: (data: {
+      memberId: number;
+      chatId: number;
+      data: UpdateChatMember;
+    }) => updateChatMember(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["chatInfo", chatId]);
     },
   });
 };

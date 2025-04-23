@@ -16,19 +16,6 @@ export type DefaultApiResponse<T> = {
 
 //Chats
 
-export type User = {
-  id: number;
-  name: string;
-  age: number;
-  avatar: string;
-  slug: string;
-  email: string;
-  phone: string | null;
-  bio: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
 export type Chat = {
   id: number;
   name: string;
@@ -89,17 +76,17 @@ export type ChatMessage = {
   pinnedAt: Date | null;
 };
 
-//Users
 export type User = {
   id: number;
   name: string;
   age: number;
-  avatar: string | null;
+  avatar: string;
   slug: string;
   email: string;
   phone: string | null;
   bio: string | null;
-  joinedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type ChatParticipant = {
@@ -107,5 +94,7 @@ export type ChatParticipant = {
   name: string;
   email: string;
   avatar: string | null;
-  role: "admin" | "moderator" | "user";
+  role: ChatRole;
 };
+
+export type ChatRole = "admin" | "moderator" | "user";

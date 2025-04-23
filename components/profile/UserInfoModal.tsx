@@ -1,4 +1,3 @@
-import { User } from "@/types";
 import CustomDialogContent from "../shared/CustomDialogContent";
 import { Dialog, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { ScrollArea } from "../ui/scroll-area";
@@ -76,7 +75,10 @@ const UserInfoModal = ({ userId }: Props) => {
     try {
       const res = await updateUserAction({
         userId,
-        data,
+        data: {
+          ...data,
+          avatar: photoPreview,
+        },
       });
 
       if (res.error) {
@@ -155,41 +157,34 @@ const UserInfoModal = ({ userId }: Props) => {
                     className="w-16 h-16 rounded-full bg-accent flex items-center justify-center group relative cursor-pointer"
                     onClick={() => fileInputRef.current?.click()}
                   >
-                    {photoPreview ? (
-                      <>
-                        <Avatar className="w-full h-full object-cover">
-                          <AvatarImage src={photoPreview} alt="Avatar" />
-                          <AvatarFallback>
-                            {data?.data?.user.name}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <Camera className="w-6 h-6 text-white" />
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <span className="text-xl font-medium text-accent-foreground">
-                          {data?.data?.user.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </span>
-                        <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <Camera className="w-6 h-6 text-white" />
-                        </div>
-                      </>
-                    )}
+                    <Avatar className="w-full h-full object-cover">
+                      <AvatarImage
+                        src={
+                          photoPreview ? photoPreview : data?.data?.user.avatar!
+                        }
+                        alt="Avatar"
+                      />
+                      <AvatarFallback>{data?.data?.user.name}</AvatarFallback>
+                    </Avatar>
+                    <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <Camera className="w-6 h-6 text-white" />
+                    </div>
                   </div>
                 </>
               ) : (
-                <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center">
-                  <span className="text-xl font-medium text-accent-foreground">
-                    {data?.data?.user.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </span>
+                <div
+                  className="w-16 h-16 rounded-full bg-accent flex items-center justify-center group relative cursor-pointer"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Avatar className="w-full h-full object-cover">
+                    <AvatarImage
+                      src={
+                        photoPreview ? photoPreview : data?.data?.user.avatar!
+                      }
+                      alt="Avatar"
+                    />
+                    <AvatarFallback>{data?.data?.user.name}</AvatarFallback>
+                  </Avatar>
                 </div>
               )}
               {/* <Circle

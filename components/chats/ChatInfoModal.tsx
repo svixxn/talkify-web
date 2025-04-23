@@ -34,6 +34,11 @@ import { Checkbox } from "../ui/checkbox";
 import { useRemoveUsersFromChat } from "@/hooks/react-query";
 import { useSocket } from "../shared/SocketProvider";
 import { useToast } from "@/hooks/useToast";
+import RoleGuard from "../shared/RoleGuard";
+import { allowedRoles } from "@/utils/allowedRoles";
+import { useUserContext } from "../shared/UserContext";
+import { Popover, PopoverTrigger } from "../ui/popover";
+import ChatUserRoleDropdown from "./ChatUserRoleDropdown";
 
 type Props = {
   id: number;
@@ -53,10 +58,15 @@ const ChatInfoModal = ({
   const [open, setOpen] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
 
+  const { user } = useUserContext();
   const { toast } = useToast();
   const socket = useSocket();
   const { mutateAsync: removeUsersFromChatAction, isLoading } =
     useRemoveUsersFromChat(id, socket);
+
+  const currentUserInChat = participants.find(
+    (member) => member.id === user?.id
+  );
 
   const handleMemberSelect = (memberId: number) => {
     setSelectedMembers((prev) => {
@@ -129,44 +139,69 @@ const ChatInfoModal = ({
         )}
 
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm font-medium text-primary">Members</h3>
-              <span className="text-xs text-muted-foreground">
-                {participants?.length}
-              </span>
+          <div className="flex flex-col justify-between  gap-4 mb-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-sm font-medium text-primary">Members</h3>
+                <span className="text-xs text-muted-foreground">
+                  {participants?.length}
+                </span>
+              </div>
+              <RoleGuard
+                allowedRoles={allowedRoles.addMembers}
+                userRole={currentUserInChat?.role!}
+              >
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      onClick={() => setOpen(true)}
+                      variant="outline"
+                      size="sm"
+                      className="gap-2"
+                    >
+                      <UserPlus className="w-4 h-4" />
+                      Add Member
+                    </Button>
+                  </DialogTrigger>
+                  <InviteUsersToChatModal
+                    chatId={id}
+                    participants={participants.map((user) => user.id)}
+                    setOpen={setOpen}
+                  />
+                </Dialog>
+              </RoleGuard>
             </div>
-            <div className="flex flex-row gap-2">
-              {selectedMembers.length > 0 && (
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={handleKickMembers}
-                  className="gap-2"
-                  disabled={isLoading}
+            <div className="flex flex-row items-center gap-2">
+              {selectedMembers.length === 1 && (
+                <RoleGuard
+                  allowedRoles={allowedRoles.changeRole}
+                  userRole={currentUserInChat?.role!}
                 >
-                  <UserX className="w-4 h-4" />
-                  Kick ({selectedMembers.length})
-                </Button>
+                  <ChatUserRoleDropdown
+                    // fix selectedMembers to include role
+                    userRole="user"
+                    userId={selectedMembers[0]}
+                    chatId={id}
+                  />
+                </RoleGuard>
               )}
-              <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger asChild>
+              {selectedMembers.length > 0 && (
+                <RoleGuard
+                  allowedRoles={allowedRoles.removeMembers}
+                  userRole={currentUserInChat?.role!}
+                >
                   <Button
-                    onClick={() => setOpen(true)}
-                    variant="outline"
+                    variant="destructive"
                     size="sm"
+                    onClick={handleKickMembers}
                     className="gap-2"
+                    disabled={isLoading}
                   >
-                    <UserPlus className="w-4 h-4" />
-                    Add Member
+                    <UserX className="w-4 h-4" />
+                    Kick ({selectedMembers.length})
                   </Button>
-                </DialogTrigger>
-                <InviteUsersToChatModal
-                  chatId={id}
-                  participants={participants.map((user) => user.id)}
-                  setOpen={setOpen}
-                />
-              </Dialog>
+                </RoleGuard>
+              )}
             </div>
           </div>
 

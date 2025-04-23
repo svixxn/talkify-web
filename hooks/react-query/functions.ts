@@ -1,5 +1,5 @@
 import { uploadOne } from "@/lib/actions/cloudinary";
-import { CreateChat, UpdateUser } from "@/lib/validations";
+import { CreateChat, UpdateChatMember, UpdateUser } from "@/lib/validations";
 import {
   Chat,
   ChatMessage,
@@ -400,6 +400,18 @@ export const updateUser = async (data: {
   data: UpdateUser;
 }): Promise<DefaultApiResponse<{ message: string }>> => {
   try {
+    if (data.data.avatar) {
+      const result = await uploadOne({
+        file: data.data.avatar,
+        folder: "talkify/users",
+        public_id: `${data.userId}`,
+      });
+
+      if (typeof result === "string") {
+        data.data.avatar = result;
+      }
+    } else delete data.data.avatar;
+
     const res = await axios.put(
       `${API_BASE_URL}/users/${data.userId}`,
       { ...data.data },
@@ -427,6 +439,31 @@ export const pinMessage = async (data: {
     const res = await axios.post(
       `${API_BASE_URL}/chats/${data.chatId}/messages/${data.messageId}/pin`,
       {},
+      {
+        headers: {
+          Authorization: "Bearer " + getCookie(authTokenName),
+        },
+      }
+    );
+
+    return { data: res.data };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { error: error.response?.data };
+  }
+};
+
+export const updateChatMember = async (data: {
+  chatId: number;
+  memberId: number;
+  data: UpdateChatMember;
+}): Promise<DefaultApiResponse<{ message: string }>> => {
+  try {
+    const res = await axios.patch(
+      `${API_BASE_URL}/chats/${data.chatId}/members/${data.memberId}`,
+      {
+        ...data.data,
+      },
       {
         headers: {
           Authorization: "Bearer " + getCookie(authTokenName),

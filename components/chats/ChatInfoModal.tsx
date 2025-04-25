@@ -1,4 +1,4 @@
-import { ChatParticipant } from "@/types";
+import { ChatParticipant, ChatRole } from "@/types";
 import {
   Dialog,
   DialogContent,
@@ -56,7 +56,9 @@ const ChatInfoModal = ({
   participants,
 }: Props) => {
   const [open, setOpen] = useState(false);
-  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<
+    { id: number; role: ChatRole }[]
+  >([]);
 
   const { user } = useUserContext();
   const { toast } = useToast();
@@ -68,18 +70,28 @@ const ChatInfoModal = ({
     (member) => member.id === user?.id
   );
 
-  const handleMemberSelect = (memberId: number) => {
+  const isCheckUserDisabled = (member: ChatParticipant) => {
+    return (
+      member.role === "admin" ||
+      member.id === user?.id ||
+      member.role === currentUserInChat?.role
+    );
+  };
+
+  const handleMemberSelect = (memberId: number, memberRole: ChatRole) => {
     setSelectedMembers((prev) => {
-      if (prev.includes(memberId)) {
-        return prev.filter((id) => id !== memberId);
+      if (prev.some((member) => member.id === memberId)) {
+        return prev.filter((member) => member.id !== memberId);
+      } else {
+        return [...prev, { id: memberId, role: memberRole }];
       }
-      return [...prev, memberId];
     });
   };
 
   const handleKickMembers = async () => {
+    const memberIds = selectedMembers.map((member) => member.id);
     const res = await removeUsersFromChatAction({
-      users: selectedMembers,
+      users: memberIds,
       chatId: id,
     });
 
@@ -179,9 +191,10 @@ const ChatInfoModal = ({
                 >
                   <ChatUserRoleDropdown
                     // fix selectedMembers to include role
-                    userRole="user"
-                    userId={selectedMembers[0]}
+                    userRole={selectedMembers[0].role}
+                    userId={selectedMembers[0].id}
                     chatId={id}
+                    setSelectedMembers={setSelectedMembers}
                   />
                 </RoleGuard>
               )}
@@ -212,16 +225,22 @@ const ChatInfoModal = ({
                   key={member.id}
                   className={cn(
                     "flex items-center gap-3 p-2 rounded-lg transition-colors",
-                    selectedMembers.includes(member.id)
+                    selectedMembers.some(
+                      (selectedMember) => selectedMember.id === member.id
+                    )
                       ? "bg-accent/50"
                       : "hover:bg-accent/30",
                     "group"
                   )}
                 >
                   <Checkbox
-                    checked={selectedMembers.includes(member.id)}
-                    onCheckedChange={() => handleMemberSelect(member.id)}
-                    disabled={member.role === "admin"}
+                    checked={selectedMembers.some(
+                      (selectedMember) => selectedMember.id === member.id
+                    )}
+                    onCheckedChange={() =>
+                      handleMemberSelect(member.id, member.role)
+                    }
+                    disabled={isCheckUserDisabled(member)}
                     className="data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
                   />
                   <div className="relative">

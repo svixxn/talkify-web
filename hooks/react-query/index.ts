@@ -110,7 +110,10 @@ export const useClearChatHistory = () => {
     onSuccess: (data, chatId) => {
       queryClient.setQueryData(["chatMessages", chatId], () => {
         return {
-          data: [],
+          data: {
+            messages: [],
+            pinnedMessage: null,
+          },
         };
       });
       queryClient.invalidateQueries("chats");

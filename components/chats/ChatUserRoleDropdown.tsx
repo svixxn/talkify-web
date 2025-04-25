@@ -20,11 +20,18 @@ type Props = {
   userRole: ChatRole;
   userId: number;
   chatId: number;
+  setSelectedMembers: React.Dispatch<
+    React.SetStateAction<{ id: number; role: ChatRole }[]>
+  >;
 };
 
-const ChatUserRoleDropdown = ({ userRole, userId, chatId }: Props) => {
+const ChatUserRoleDropdown = ({
+  userRole,
+  userId,
+  chatId,
+  setSelectedMembers,
+}: Props) => {
   const [value, setValue] = useState(userRole);
-  console.log("userRole", userRole);
 
   const { mutateAsync: updateChatMemberAction, isLoading } =
     useUpdateChatMember(userId, chatId);
@@ -48,6 +55,8 @@ const ChatUserRoleDropdown = ({ userRole, userId, chatId }: Props) => {
     toast({
       title: "Member updated successfully",
     });
+
+    setSelectedMembers([]);
   };
 
   return (

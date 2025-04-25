@@ -124,7 +124,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
   const scrollToMessage = (messageId: number) => {
     const element = document.getElementById(`message-${messageId}`);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "center" });
+      element.scrollIntoView({ behavior: "instant", block: "center" });
       element.classList.add("bg-primary/10");
       setTimeout(() => {
         element.classList.remove("bg-primary/10");
@@ -271,6 +271,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
                 isGroup={chatInfo?.data?.chatInfo.isGroup!}
                 senderId={message.senderId}
                 isPinned={message.isPinned}
+                scrollToMessage={scrollToMessage}
               />
             ))}
           </div>

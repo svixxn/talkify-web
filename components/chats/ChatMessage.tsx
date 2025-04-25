@@ -52,6 +52,7 @@ type Props = {
   setReplyMessage: React.Dispatch<
     React.SetStateAction<{ id: number; content: string; sender: string } | null>
   >;
+  scrollToMessage: (id: number) => void;
 };
 const ChatMessage = ({
   message,
@@ -68,6 +69,7 @@ const ChatMessage = ({
   isGroup,
   senderId,
   isPinned,
+  scrollToMessage,
 }: Props) => {
   const { toast } = useToast();
   const { mutateAsync: deleteChatMessageAction } = useDeleteChatMessage();
@@ -154,9 +156,10 @@ const ChatMessage = ({
       {parentMessage && (
         <div
           className={cn(
-            "flex items-center gap-2 text-xs mb-2 text-muted-foreground",
+            "flex items-center hover:underline hover:cursor-pointer gap-2 text-xs mb-2 text-muted-foreground",
             isCurrentUserSender ? "justify-end mr-3" : "ml-3"
           )}
+          onClick={() => scrollToMessage(parentMessage.id)}
         >
           <span>Replying to</span>
           <span className="font-medium text-primary">

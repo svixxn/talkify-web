@@ -39,6 +39,7 @@ import { allowedRoles } from "@/utils/allowedRoles";
 import { useUserContext } from "../shared/UserContext";
 import { Popover, PopoverTrigger } from "../ui/popover";
 import ChatUserRoleDropdown from "./ChatUserRoleDropdown";
+import UserInfoModal from "../profile/UserInfoModal";
 
 type Props = {
   id: number;
@@ -190,7 +191,6 @@ const ChatInfoModal = ({
                   userRole={currentUserInChat?.role!}
                 >
                   <ChatUserRoleDropdown
-                    // fix selectedMembers to include role
                     userRole={selectedMembers[0].role}
                     userId={selectedMembers[0].id}
                     chatId={id}
@@ -249,11 +249,18 @@ const ChatInfoModal = ({
                       <AvatarFallback>TLK</AvatarFallback>
                     </Avatar>
                   </div>
+
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-primary">
-                        {member.name}
-                      </span>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <span className="text-sm font-medium text-primary cursor-pointer">
+                            {member.name}
+                          </span>
+                        </DialogTrigger>
+
+                        <UserInfoModal userId={member.id} />
+                      </Dialog>
                       <span
                         className={cn(
                           "text-xs px-2 py-0.5 rounded-full",

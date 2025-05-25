@@ -36,6 +36,9 @@ const ChatInput = ({
 
   const handleSendMessage = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (files.some((f) => f.loading)) return;
+
     const message = chatInputRef.current?.value.trim() || "";
     onSendMessage(
       message.trim(),

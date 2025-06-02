@@ -146,15 +146,20 @@ const UserInfoModal = ({ userId }: Props) => {
             <div className="relative">
               {isCurrentUser ? (
                 <>
-                  <Input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handlePhotoChange}
-                    accept="image/*"
-                    className="hidden"
-                  />
+                  {isEditing && (
+                    <Input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handlePhotoChange}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                  )}
+
                   <div
-                    className="w-16 h-16 rounded-full bg-accent flex items-center justify-center group relative cursor-pointer"
+                    className={`w-16 h-16 rounded-full bg-accent flex items-center justify-center group relative ${
+                      isEditing && "cursor-pointer"
+                    }`}
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <Avatar className="w-full h-full object-cover">
@@ -166,9 +171,11 @@ const UserInfoModal = ({ userId }: Props) => {
                       />
                       <AvatarFallback>{data?.data?.user.name}</AvatarFallback>
                     </Avatar>
-                    <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <Camera className="w-6 h-6 text-white" />
-                    </div>
+                    {isEditing && (
+                      <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Camera className="w-6 h-6 text-white" />
+                      </div>
+                    )}
                   </div>
                 </>
               ) : (
@@ -248,7 +255,6 @@ const UserInfoModal = ({ userId }: Props) => {
 
             <Separator />
 
-            {/* Contact & Location */}
             <div className="space-y-4">
               {isCurrentUser && isEditing ? (
                 <div className="space-y-2">

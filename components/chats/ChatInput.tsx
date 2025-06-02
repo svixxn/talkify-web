@@ -1,9 +1,21 @@
-import { File, ImageIcon, Loader2, Paperclip, SendIcon, X } from "lucide-react";
+import {
+  File,
+  ImageIcon,
+  Loader2,
+  Paperclip,
+  SendHorizontal,
+  SendIcon,
+  Smile,
+  X,
+} from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { deleteOne, uploadOne } from "@/lib/actions/cloudinary";
+import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import EmojiPickerWrapper from "./EmojiPicker";
 
 type Props = {
   chatId: number;
@@ -115,6 +127,23 @@ const ChatInput = ({
     return <File className="w-4 h-4" />;
   };
 
+  const onEmojiClick = (emojiData: EmojiClickData) => {
+    console.log("Emoji clicked:", emojiData);
+    const input = chatInputRef.current;
+    if (input) {
+      const start = input.selectionStart || 0;
+      const end = input.selectionEnd || 0;
+      const textBefore = input.value.substring(0, start);
+      const textAfter = input.value.substring(end);
+      input.value = `${textBefore}${emojiData.emoji}${textAfter}`;
+      input.focus();
+      input.setSelectionRange(
+        start + emojiData.emoji.length,
+        start + emojiData.emoji.length
+      );
+    }
+  };
+
   return (
     <div>
       {files.length > 0 && (
@@ -223,9 +252,13 @@ const ChatInput = ({
             placeholder="Type your message..."
             className="h-16 flex-1 bg-[#1D283A80] resize-none rounded-md border border-input pr-20 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
           />
-          <Button size="icon" className="absolute right-12" type="submit">
-            <SendIcon className="h-4 w-4" />
-            <span className="sr-only">Send</span>
+          <EmojiPickerWrapper onEmojiClick={onEmojiClick} />
+          <Button
+            size="icon"
+            className="h-[50px] w-[50px] bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-black/20 rounded-2xl"
+            type="submit"
+          >
+            <SendHorizontal className="h-5 w-5" />
           </Button>
         </div>
       </form>

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Crown,
   LogOut,
   Menu,
   MessageSquare,
@@ -27,6 +28,7 @@ import CreateChatModal from "../chats/CreateChatModal";
 import { useEffect, useState } from "react";
 import UserInfoModal from "../profile/UserInfoModal";
 import { useUserContext } from "./UserContext";
+import GoPremiumModal from "../premium/GoPremiumModal";
 type Props = {
   username: string | undefined;
 };
@@ -35,6 +37,7 @@ const UserDropdownMenu = ({ username }: Props) => {
   const { user } = useUserContext();
   const [createChatModalOpen, setCreateChatModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [goPremiumModalOpen, setGoPremiumModalOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -47,12 +50,13 @@ const UserDropdownMenu = ({ username }: Props) => {
     if (!open) {
       setCreateChatModalOpen(false);
       setProfileModalOpen(false);
+      setGoPremiumModalOpen(false);
     }
   };
 
   return (
     <Dialog
-      open={createChatModalOpen || profileModalOpen}
+      open={createChatModalOpen || profileModalOpen || goPremiumModalOpen}
       onOpenChange={handleOpenChange}
     >
       <DropdownMenu>
@@ -83,13 +87,16 @@ const UserDropdownMenu = ({ username }: Props) => {
               <Users className="mr-2 h-4 w-4" />
               <span>Search users</span>
             </DropdownMenuItem>
-            <DialogTrigger asChild>
-              <DropdownMenuItem onClick={() => setCreateChatModalOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                <span>New Chat</span>
-              </DropdownMenuItem>
-            </DialogTrigger>
+            <DropdownMenuItem onClick={() => setCreateChatModalOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              <span>New Chat</span>
+            </DropdownMenuItem>
           </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setGoPremiumModalOpen(true)}>
+            <Crown className="mr-2 h-4 w-4" />
+            <span>Go premium</span>
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogOut}>
             <LogOut className="mr-2 h-4 w-4" />
@@ -101,6 +108,7 @@ const UserDropdownMenu = ({ username }: Props) => {
         <CreateChatModal setOpen={setCreateChatModalOpen} />
       )}
       {profileModalOpen && <UserInfoModal userId={user?.id || 0} />}
+      {goPremiumModalOpen && <GoPremiumModal userId={user?.id || 0} />}
     </Dialog>
   );
 };

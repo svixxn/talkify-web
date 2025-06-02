@@ -127,19 +127,24 @@ const ChatInfoModal = ({
               </DialogTitle>
             </div>
           </div>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <Settings2 className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-            <ChatSettingsModal
-              id={id}
-              name={name}
-              description={description}
-              image={photo}
-            />
-          </Dialog>
+          <RoleGuard
+            allowedRoles={["admin", "moderator"]}
+            userRole={currentUserInChat?.role!}
+          >
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Settings2 className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <ChatSettingsModal
+                id={id}
+                name={name}
+                description={description}
+                image={photo}
+              />
+            </Dialog>
+          </RoleGuard>
         </div>
       </DialogHeader>
 

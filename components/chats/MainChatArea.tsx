@@ -22,6 +22,7 @@ import { Dialog, DialogTrigger } from "../ui/dialog";
 import ChatInfoModal from "./ChatInfoModal";
 import UserInfoModal from "../profile/UserInfoModal";
 import ChatInput from "./ChatInput";
+import RoleGuard from "../shared/RoleGuard";
 
 type Props = {
   currentChatId: number;
@@ -61,6 +62,10 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
       });
     }
   }, []);
+
+  const currentUserInChat = chatInfo?.data?.participants.find(
+    (member) => member.id === user?.id
+  );
 
   useEffect(() => {
     if (chatMessages?.data && chatInfo?.data) {
@@ -197,10 +202,14 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
             )}
           </Dialog>
         </div>
-
-        <div className="ml-auto">
-          <ChatDropdownMenu chatId={currentChatId} />
-        </div>
+        <RoleGuard
+          allowedRoles={["admin", "moderator"]}
+          userRole={currentUserInChat?.role!}
+        >
+          <div className="ml-auto">
+            <ChatDropdownMenu chatId={currentChatId} />
+          </div>
+        </RoleGuard>
       </div>
 
       {chatMessages?.data?.pinnedMessage && (

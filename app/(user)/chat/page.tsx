@@ -13,11 +13,34 @@ import {
 import { MessageSquareDiff, MessagesSquare } from "lucide-react";
 import useScreenSize from "@/hooks/useScreenWidth";
 import ChatEmptyState from "@/components/shared/ChatEmptyState";
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { useToast } from "@/hooks/useToast";
 
 const ChatPage = () => {
   const { user, isLoading: isUserLoading } = useUserContext();
   const { currentChatId } = useChatContext();
   const { screenSize } = useScreenSize();
+  const { toast } = useToast();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const stripeCheckoutResponse = searchParams.get("checkout_success");
+    if (stripeCheckoutResponse) {
+      if (stripeCheckoutResponse === "true") {
+        toast({
+          title: "Payment Successful",
+          description: "Your subscription has been activated.",
+        });
+      } else {
+        toast({
+          title: "Payment Failed or Canceled",
+          description:
+            "Your subscription could not be activated. Please try again.",
+        });
+      }
+    }
+  }, [searchParams]);
 
   return (
     <div className="flex md:p-4 h-screen w-full bg-background">

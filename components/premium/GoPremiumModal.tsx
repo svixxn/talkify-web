@@ -17,6 +17,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import CustomDialogContent from "../shared/CustomDialogContent";
+import { createStripeCheckoutSession } from "@/hooks/react-query/functions";
+import { useToast } from "@/hooks/useToast";
+import { useCreateStripeCheckoutSession } from "@/hooks/react-query";
 
 type PremiumModalProps = {
   userId: number;
@@ -25,8 +28,8 @@ type PremiumModalProps = {
 const FEATURES = [
   {
     icon: InfinityIcon,
-    title: "Unlimited Messages",
-    description: "Send unlimited messages with no daily restrictions",
+    title: "Unlimited Chat Members",
+    description: "Add as many members as you want to your group chats",
   },
   {
     icon: Shield,
@@ -36,8 +39,28 @@ const FEATURES = [
 ];
 
 const GoPremiumModal = ({ userId }: PremiumModalProps) => {
-  const handleUpgrade = () => {
-    console.log("Redirecting to Stripe checkout...");
+  const { toast } = useToast();
+  const { mutateAsync: createCheckoutSession, isLoading } =
+    useCreateStripeCheckoutSession();
+
+  const handleUpgrade = async () => {
+    const { data, error } = await createCheckoutSession();
+
+    if (error) {
+      toast({
+        title: `An error occurred: ${error.message}`,
+      });
+      return;
+    }
+
+    if (data?.url) {
+      window.location.href = data.url;
+    } else {
+      toast({
+        title: "Failed to create checkout session",
+        description: "Please try again later.",
+      });
+    }
   };
 
   return (
@@ -89,6 +112,7 @@ const GoPremiumModal = ({ userId }: PremiumModalProps) => {
           </div>
           <Button
             onClick={handleUpgrade}
+            disabled={isLoading}
             className="w-full bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:opacity-90 transition-opacity gap-2"
           >
             <Sparkles className="w-4 h-4" />

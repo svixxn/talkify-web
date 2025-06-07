@@ -35,6 +35,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { UpdateUser, UpdateUserSChema } from "@/lib/validations";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useToast } from "@/hooks/useToast";
+import PremiumBadge from "../shared/PremiumBadge";
 
 type Props = {
   userId: number;
@@ -213,11 +214,12 @@ const UserInfoModal = ({ userId }: Props) => {
                   />
                 </div>
               ) : (
-                <>
+                <div className="flex gap-2 items-center">
                   <DialogTitle className="text-xl font-semibold text-primary">
                     {data?.data?.user.name}
                   </DialogTitle>
-                </>
+                  {data?.data?.user.isPremium && <PremiumBadge />}
+                </div>
               )}
             </div>
             {isCurrentUser && (
@@ -296,9 +298,8 @@ const UserInfoModal = ({ userId }: Props) => {
 
             <Separator />
 
-            {isCurrentUser && (
+            {/* {isCurrentUser && (
               <>
-                {/* Preferences */}
                 <div className="space-y-4">
                   <h3 className="text-sm font-medium text-primary">
                     Preferences
@@ -313,15 +314,15 @@ const UserInfoModal = ({ userId }: Props) => {
                       </div>
                       <Switch
                         checked={true}
-                        // onCheckedChange={(checked) =>
-                        //   setdata?.data?.user({
-                        //     ...data?.data?.user,
-                        //     notifications: {
-                        //       ...data?.data?.user.notifications,
-                        //       email: checked,
-                        //     },
-                        //   })
-                        // }
+                        onCheckedChange={(checked) =>
+                          setdata?.data?.user({
+                            ...data?.data?.user,
+                            notifications: {
+                              ...data?.data?.user.notifications,
+                              email: checked,
+                            },
+                          })
+                        }
                       />
                     </div>
                     <div className="flex items-center justify-between">
@@ -333,16 +334,16 @@ const UserInfoModal = ({ userId }: Props) => {
                       </div>
                       <Switch
                         checked={true}
-                        // checked={data?.data?.user.privacy.showEmail}
-                        // onCheckedChange={(checked) =>
-                        //   setdata?.data?.user({
-                        //     ...data?.data?.user,
-                        //     privacy: {
-                        //       ...data?.data?.user.privacy,
-                        //       showEmail: checked,
-                        //     },
-                        //   })
-                        // }
+                        checked={data?.data?.user.privacy.showEmail}
+                        onCheckedChange={(checked) =>
+                          setdata?.data?.user({
+                            ...data?.data?.user,
+                            privacy: {
+                              ...data?.data?.user.privacy,
+                              showEmail: checked,
+                            },
+                          })
+                        }
                       />
                     </div>
                     <div className="flex items-center justify-between">
@@ -354,15 +355,15 @@ const UserInfoModal = ({ userId }: Props) => {
                       </div>
                       <Switch
                         checked={true}
-                        // onCheckedChange={(checked) =>
-                        //   setdata?.data?.user({
-                        //     ...data?.data?.user,
-                        //     privacy: {
-                        //       ...data?.data?.user.privacy,
-                        //       showLocation: checked,
-                        //     },
-                        //   })
-                        // }
+                        onCheckedChange={(checked) =>
+                          setdata?.data?.user({
+                            ...data?.data?.user,
+                            privacy: {
+                              ...data?.data?.user.privacy,
+                              showLocation: checked,
+                            },
+                          })
+                        }
                       />
                     </div>
                   </div>
@@ -370,10 +371,10 @@ const UserInfoModal = ({ userId }: Props) => {
 
                 <Separator />
               </>
-            )}
+            )} */}
 
             {/* Actions */}
-            {!isCurrentUser && (
+            {/* {!isCurrentUser && (
               <div className="flex gap-3">
                 <Button className="flex-1" variant="secondary">
                   Block User
@@ -382,7 +383,7 @@ const UserInfoModal = ({ userId }: Props) => {
                   Report User
                 </Button>
               </div>
-            )}
+            )} */}
           </div>
         </ScrollArea>
       </form>

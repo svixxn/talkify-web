@@ -83,21 +83,23 @@ const UserDropdownMenu = ({ username }: Props) => {
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <Users className="mr-2 h-4 w-4" />
-              <span>Search users</span>
-            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setCreateChatModalOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               <span>New Chat</span>
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setGoPremiumModalOpen(true)}>
-            <Crown className="mr-2 h-4 w-4" />
-            <span>Go premium</span>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
+
+          {!user?.isPremium && (
+            <>
+              <DropdownMenuItem onClick={() => setGoPremiumModalOpen(true)}>
+                <Crown className="mr-2 h-4 w-4" />
+                <span>Go premium</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
+
           <DropdownMenuItem onClick={handleLogOut}>
             <LogOut className="mr-2 h-4 w-4" />
             <span>Log out</span>

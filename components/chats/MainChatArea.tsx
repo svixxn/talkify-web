@@ -191,6 +191,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
                 photo={chatInfo?.data?.chatInfo.photo!}
                 participants={chatInfo?.data?.participants!}
                 description={chatInfo?.data?.chatInfo.description}
+                isPremium={chatInfo?.data?.chatInfo.isPremium}
               />
             ) : (
               <UserInfoModal

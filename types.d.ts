@@ -86,7 +86,8 @@ export type User = {
   phone: string | null;
   bio: string | null;
   createdAt: Date;
-  updatedAt: Date;
+  stripeCustomerId: string | null;
+  isPremium: boolean;
 };
 
 export type ChatParticipant = {
@@ -95,6 +96,7 @@ export type ChatParticipant = {
   email: string;
   avatar: string | null;
   role: ChatRole;
+  isPremium: boolean;
 };
 
 export type ChatRole = "admin" | "moderator" | "user";

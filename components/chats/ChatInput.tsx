@@ -128,7 +128,6 @@ const ChatInput = ({
   };
 
   const onEmojiClick = (emojiData: EmojiClickData) => {
-    console.log("Emoji clicked:", emojiData);
     const input = chatInputRef.current;
     if (input) {
       const start = input.selectionStart || 0;

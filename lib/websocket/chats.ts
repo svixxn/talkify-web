@@ -7,7 +7,6 @@ export function updateMessagesStatusOnNewMessage(
   message: LocalMessage
 ) {
   queryClient.setQueryData(["chatMessages", chatId], (oldData: any) => {
-    console.log("oldData", oldData);
     return {
       data: {
         messages: [...(oldData?.data.messages || []), message],

@@ -40,12 +40,14 @@ import { useUserContext } from "../shared/UserContext";
 import { Popover, PopoverTrigger } from "../ui/popover";
 import ChatUserRoleDropdown from "./ChatUserRoleDropdown";
 import UserInfoModal from "../profile/UserInfoModal";
+import PremiumBadge from "../shared/PremiumBadge";
 
 type Props = {
   id: number;
   name: string;
   photo: string;
   description: string | undefined;
+  isPremium: boolean;
   participants: ChatParticipant[];
 };
 
@@ -54,6 +56,7 @@ const ChatInfoModal = ({
   name,
   photo,
   description,
+  isPremium,
   participants,
 }: Props) => {
   const [open, setOpen] = useState(false);
@@ -121,10 +124,11 @@ const ChatInfoModal = ({
                 <AvatarFallback>{name}</AvatarFallback>
               </Avatar>
             </div>
-            <div>
+            <div className="flex items-center gap-2">
               <DialogTitle className="text-xl font-semibold text-primary">
                 {name}
               </DialogTitle>
+              {isPremium && <PremiumBadge />}
             </div>
           </div>
           <RoleGuard
@@ -259,9 +263,12 @@ const ChatInfoModal = ({
                     <div className="flex items-center justify-between">
                       <Dialog>
                         <DialogTrigger asChild>
-                          <span className="text-sm font-medium text-primary cursor-pointer">
-                            {member.name}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-primary cursor-pointer">
+                              {member.name}
+                            </span>
+                            {member.isPremium && <PremiumBadge />}
+                          </div>
                         </DialogTrigger>
 
                         <UserInfoModal userId={member.id} />

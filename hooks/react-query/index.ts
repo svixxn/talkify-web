@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "react-query";
 import {
   clearChatHistory,
   createChat,
+  createStripeCheckoutSession,
   deleteChat,
   deleteChatMessage,
   getChatInfo,
@@ -202,6 +203,7 @@ export const useInviteUsersToChat = (chatId: number, socket: Socket | null) => {
     mutationFn: (data: { users: number[]; chatId: number }) =>
       inviteUsersToChat(data),
     onSuccess: (data) => {
+      if (data.error) return;
       queryClient.invalidateQueries(["chatInfo", chatId]);
       updateMessagesStatusOnNewMessage(
         queryClient,
@@ -258,5 +260,12 @@ export const useUpdateChatMember = (memberId: number, chatId: number) => {
     onSuccess: () => {
       queryClient.invalidateQueries(["chatInfo", chatId]);
     },
+  });
+};
+
+export const useCreateStripeCheckoutSession = () => {
+  return useMutation({
+    mutationKey: ["createStripeCheckoutSession"],
+    mutationFn: () => createStripeCheckoutSession(),
   });
 };

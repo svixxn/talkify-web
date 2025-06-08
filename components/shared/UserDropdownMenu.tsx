@@ -29,6 +29,7 @@ import { useEffect, useState } from "react";
 import UserInfoModal from "../profile/UserInfoModal";
 import { useUserContext } from "./UserContext";
 import GoPremiumModal from "../premium/GoPremiumModal";
+import { useQueryClient } from "react-query";
 type Props = {
   username: string | undefined;
 };
@@ -41,8 +42,11 @@ const UserDropdownMenu = ({ username }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
 
+  const queryClient = useQueryClient();
+
   const handleLogOut = async () => {
     await axios.delete("/api/login");
+    queryClient.clear();
     router.replace("/");
   };
 

@@ -1,6 +1,6 @@
 import AuthModal from "@/components/auth/AuthModal";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Shield, Zap, Globe2 } from "lucide-react";
+import { MessageCircle, Shield, Zap, Globe2, Check } from "lucide-react";
 
 const LandingPage = () => {
   return (
@@ -11,26 +11,7 @@ const LandingPage = () => {
             <MessageCircle className="w-8 h-8 text-blue-400" />
             <span className="text-2xl font-bold text-white">Talkify</span>
           </div>
-          <div className="hidden md:flex space-x-8">
-            <a
-              href="#features"
-              className="text-gray-300 hover:text-white transition"
-            >
-              Features
-            </a>
-            <a
-              href="#pricing"
-              className="text-gray-300 hover:text-white transition"
-            >
-              Pricing
-            </a>
-            <a
-              href="#about"
-              className="text-gray-300 hover:text-white transition"
-            >
-              About
-            </a>
-          </div>
+
           <AuthModal />
         </nav>
 
@@ -43,20 +24,13 @@ const LandingPage = () => {
             Experience real-time communication with crystal-clear quality. Built
             for teams and individuals who value seamless connectivity.
           </p>
-          <div className="flex justify-center space-x-4">
-            <Button className="p-8 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-lg font-semibold transition">
-              Get Started Free
-            </Button>
-            <Button className="p-8 border bg-transparent hover:bg-transparent border-gray-600 hover:border-gray-400 text-white rounded-lg text-lg font-semibold transition">
-              See How It Works
-            </Button>
-          </div>
+          <div className="flex justify-center space-x-4"></div>
         </div>
       </div>
 
       {/* Features Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid md:grid-cols-3 gap-12">
+        <div className="grid md:grid-cols-2 gap-12">
           <div className="text-center p-6">
             <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <Zap className="w-8 h-8 text-blue-400" />
@@ -71,17 +45,6 @@ const LandingPage = () => {
           </div>
           <div className="text-center p-6">
             <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Shield className="w-8 h-8 text-blue-400" />
-            </div>
-            <h3 className="text-xl font-semibold text-white mb-4">
-              Secure by Design
-            </h3>
-            <p className="text-gray-400">
-              End-to-end encryption ensures your conversations stay private.
-            </p>
-          </div>
-          <div className="text-center p-6">
-            <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <Globe2 className="w-8 h-8 text-blue-400" />
             </div>
             <h3 className="text-xl font-semibold text-white mb-4">
@@ -90,6 +53,46 @@ const LandingPage = () => {
             <p className="text-gray-400">
               Connect with anyone, anywhere in the world seamlessly.
             </p>
+          </div>
+        </div>
+      </div>
+
+      <div id="solutions" className="bg-slate-800/30 py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Built for every <span className="text-blue-400">team size</span>
+            </h2>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              From startups to enterprises, ChatSync scales with your needs.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <img
+                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop&crop=center"
+                alt="Team collaboration"
+                className="rounded-2xl shadow-xl"
+              />
+            </div>
+            <div>
+              <h3 className="text-3xl font-bold text-white mb-6">For Teams</h3>
+              <p className="text-gray-400 mb-8 text-lg leading-relaxed">
+                Streamline your team communication with channels and direct
+                messages. Keep everyone aligned and productive.
+              </p>
+              <ul className="space-y-4">
+                <li className="flex items-center text-gray-300">
+                  <Check className="w-5 h-5 text-green-400 mr-3" />
+                  Unlimited channels and direct messages
+                </li>
+                <li className="flex items-center text-gray-300">
+                  <Check className="w-5 h-5 text-green-400 mr-3" />
+                  Advanced admin controls and permissions
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -121,7 +124,7 @@ const LandingPage = () => {
               <span className="text-white font-semibold">Talkify</span>
             </div>
             <div className="text-gray-400">
-              © 2024 Talkify. All rights reserved.
+              © {new Date().getFullYear()} Talkify. All rights reserved.
             </div>
           </div>
         </div>

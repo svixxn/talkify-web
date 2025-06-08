@@ -23,6 +23,7 @@ import ChatInfoModal from "./ChatInfoModal";
 import UserInfoModal from "../profile/UserInfoModal";
 import ChatInput from "./ChatInput";
 import RoleGuard from "../shared/RoleGuard";
+import { allowedRoles } from "@/utils/allowedRoles";
 
 type Props = {
   currentChatId: number;
@@ -204,7 +205,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
           </Dialog>
         </div>
         <RoleGuard
-          allowedRoles={["admin", "moderator"]}
+          allowedRoles={allowedRoles.chatDropdownMenu}
           userRole={currentUserInChat?.role!}
         >
           <div className="ml-auto">

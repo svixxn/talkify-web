@@ -132,7 +132,7 @@ const ChatInfoModal = ({
             </div>
           </div>
           <RoleGuard
-            allowedRoles={["admin", "moderator"]}
+            allowedRoles={allowedRoles.chatSettings}
             userRole={currentUserInChat?.role!}
           >
             <Dialog>

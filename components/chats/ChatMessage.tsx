@@ -77,6 +77,8 @@ const ChatMessage = ({
   const socket = useSocket();
   const { mutateAsync: pinMessageAction } = usePinMessage(chatId, socket);
 
+  const areThereFiles = files && files.length > 0;
+
   const handleDeleteMessage = async () => {
     updateMessagesStatusOnDeleteMessage(queryClient, chatId, id);
     socket?.emit("delete-message", JSON.stringify({ chatId, messageId: id }));
@@ -202,7 +204,9 @@ const ChatMessage = ({
                         : "message-system text-primary rounded-bl-sm"
                     } text-sm`}
                   >
-                    <div className={`flex flex-col px-3`}>
+                    <div
+                      className={`flex flex-col ${!areThereFiles && "px-3"}`}
+                    >
                       {!isCurrentUserSender && isGroup && (
                         <div className="mb-1 pt-2">
                           <span className="text-sm font-medium bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
@@ -210,17 +214,14 @@ const ChatMessage = ({
                           </span>
                         </div>
                       )}
-                      {files?.length > 0 && (
+                      {areThereFiles && (
                         <div
                           className={`${
                             files.length > 4 ? "grid grid-cols-4" : "flex"
-                          } gap-1`}
+                          } `}
                         >
                           {files.map((file, index) => (
-                            <div
-                              key={index}
-                              className="relative group/image mt-3"
-                            >
+                            <div key={index} className="relative group/image">
                               <Image
                                 width={files.length > 1 ? 250 : 350}
                                 height={files.length > 1 ? 250 : 350}
@@ -246,10 +247,12 @@ const ChatMessage = ({
                           ))}
                         </div>
                       )}
-                      <div className="flex items-center gap-2">
-                        <p className="break-all">{message}</p>
+                      <div className="flex items-end gap-2">
+                        <p className={`break-all ${!areThereFiles && "py-2"}`}>
+                          {message}
+                        </p>
                         <span
-                          className={`text-[10px] opacity-80 ml-auto pt-3 ${
+                          className={`text-[10px] opacity-80 ml-auto ${
                             message === "" && "pr-3"
                           }`}
                         >

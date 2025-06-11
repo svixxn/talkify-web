@@ -88,7 +88,7 @@ const SignInTab = () => {
         )}
       </form>
 
-      <div className="relative">
+      {/* <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <Separator />
         </div>
@@ -116,7 +116,7 @@ const SignInTab = () => {
           <Mail className="mr-2 h-4 w-4" />
           Email
         </Button>
-      </div>
+      </div> */}
     </TabsContent>
   );
 };

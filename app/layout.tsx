@@ -4,11 +4,19 @@ import { Inter as FontSans } from "next/font/google";
 import { cn } from "@/lib/utils";
 import ReactQueryProvider from "@/components/shared/ReactQueryProvider";
 import { Toaster } from "@/components/ui/toaster";
+import Head from "next/head";
+import { Metadata } from "next";
 
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
 });
+
+export const metadata: Metadata = {
+  title: "Talkify - Welcome",
+  description:
+    "Talkify is a chat application that connects people through conversations.",
+};
 
 export default function RootLayout({
   children,

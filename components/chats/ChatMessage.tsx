@@ -208,7 +208,7 @@ const ChatMessage = ({
                       className={`flex flex-col ${!areThereFiles && "px-3"}`}
                     >
                       {!isCurrentUserSender && isGroup && (
-                        <div className="mb-1 pt-2">
+                        <div className={`mb-1 pt-2 ${areThereFiles && "px-3"}`}>
                           <span className="text-sm font-medium bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
                             {senderName}
                           </span>
@@ -248,12 +248,16 @@ const ChatMessage = ({
                         </div>
                       )}
                       <div className="flex items-end gap-2">
-                        <p className={`break-all ${!areThereFiles && "py-2"}`}>
+                        <p
+                          className={`break-all ${
+                            (!areThereFiles || message) && "py-2"
+                          } ${areThereFiles && "px-3"}`}
+                        >
                           {message}
                         </p>
                         <span
                           className={`text-[10px] opacity-80 ml-auto ${
-                            message === "" && "pr-3"
+                            (message === "" || areThereFiles) && "pr-3"
                           }`}
                         >
                           {timestamp.getHours().toString().padStart(2, "0") +

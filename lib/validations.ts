@@ -27,7 +27,7 @@ export const CreateChatSchema = z
 
 export const SignUpSchema = z
   .object({
-    email: z.string().email(),
+    email: z.string().email().max(25),
     name: z.string().min(3),
     age: z.string().min(1, "Age cannot be empty").or(z.number()),
     password: z.string().min(6),

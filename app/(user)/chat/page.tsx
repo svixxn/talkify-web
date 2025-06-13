@@ -20,7 +20,7 @@ const ChatPage = () => {
   const { user, isLoading: isUserLoading } = useUserContext();
   const { currentChatId } = useChatContext();
   const { screenSize } = useScreenSize();
-  const { toast } = useToast();
+  // const { toast } = useToast();
   // const searchParams = useSearchParams();
 
   // useEffect(() => {

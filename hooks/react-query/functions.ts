@@ -45,6 +45,8 @@ type UpdateChatResponse = {
 type CreateUserResponse = {
   message: string;
   userId: number;
+  token: string;
+  expiresIn: string;
 };
 
 type SignInResponse = {

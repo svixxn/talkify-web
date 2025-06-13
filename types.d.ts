@@ -41,7 +41,7 @@ export type LocalMessage = {
   updatedAt: Date;
   senderId: number;
   chatId: number;
-  content: string;
+  content: string | null;
   messageType: string;
   parentId: number | null;
   files: string[];

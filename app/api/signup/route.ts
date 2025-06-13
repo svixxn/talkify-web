@@ -1,18 +1,16 @@
-import { loginUser } from "@/hooks/react-query/functions";
+import { registerUser } from "@/hooks/react-query/functions";
 import { authTokenName } from "@/utils/constants";
 import { addTimeToDate } from "@/utils/general";
-import { SignInSchema } from "@/lib/validations";
 
 export async function POST(request: Request) {
   const body = await request.json();
 
-  const parseRes = SignInSchema.safeParse(body);
-
-  if (!parseRes.success) {
-    return Response.json({ message: parseRes.error.errors });
-  }
-
-  const res = await loginUser(parseRes.data);
+  const res = await registerUser({
+    email: body.email,
+    age: parseInt(body.age.toString()),
+    name: body.name,
+    password: body.password,
+  });
 
   if (res.error) return new Response(JSON.stringify({ error: res.error }));
 
@@ -25,14 +23,6 @@ export async function POST(request: Request) {
   return new Response(JSON.stringify({ message: "success" }), {
     headers: {
       "Set-Cookie": `${authTokenName}=${token};expires=${finalExpiresData.toUTCString()};path=/`,
-    },
-  });
-}
-
-export async function DELETE() {
-  return new Response(null, {
-    headers: {
-      "Set-Cookie": `${authTokenName}=deleted;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`,
     },
   });
 }

@@ -23,7 +23,7 @@ export function updateMessagesStatusOnNewMessage(
     if (chatIndex > -1) {
       const updatedChat = {
         ...oldData.data[chatIndex],
-        lastMessage: message.content,
+        lastMessage: message.content ? message.content : "[FILE]",
         lastMessageDate: message.createdAt,
       };
 

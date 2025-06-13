@@ -9,12 +9,13 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { SignIn, SignUp } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SignInSchema, SignUpSchema } from "@/lib/validations";
-import axios from "axios";
 import { useToast } from "@/hooks/useToast";
 import { useRegisterUser } from "@/hooks/react-query";
+import axios from "axios";
 
 const SignUpTab = () => {
   const { toast } = useToast();
+  const router = useRouter();
 
   const {
     register,
@@ -26,19 +27,12 @@ const SignUpTab = () => {
     resolver: zodResolver(SignUpSchema),
   });
 
-  const { mutateAsync: registerUserAction } = useRegisterUser();
-
   const onSubmit: SubmitHandler<SignUp> = async (data) => {
-    const res = await registerUserAction({
-      email: data.email,
-      age: parseInt(data.age.toString()),
-      name: data.name,
-      password: data.password,
-    });
+    const res = await axios.post("/api/signup", data);
 
-    if (res.error) {
+    if (res.data.error) {
       setError("email", {
-        message: res.error.message,
+        message: res.data.error.message,
       });
       return;
     }
@@ -48,6 +42,8 @@ const SignUpTab = () => {
     });
 
     reset();
+
+    router.push("/chat");
   };
 
   return (

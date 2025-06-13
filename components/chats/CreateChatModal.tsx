@@ -163,7 +163,9 @@ const CreateChatModal = ({ setOpen }: Props) => {
             </TabsContent>
           </Tabs>
           <DialogFooter>
-            <Button type="submit">Create chat</Button>
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+              Create chat
+            </Button>
           </DialogFooter>
           {form.formState.errors.root && (
             <span className="text-red-500 text-xs">

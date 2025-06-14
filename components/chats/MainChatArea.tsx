@@ -24,6 +24,7 @@ import UserInfoModal from "../profile/UserInfoModal";
 import ChatInput from "./ChatInput";
 import RoleGuard from "../shared/RoleGuard";
 import { allowedRoles } from "@/utils/allowedRoles";
+import MessagesSkeleton from "./MessagesSkeleton";
 
 type Props = {
   currentChatId: number;
@@ -138,7 +139,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
     }
   };
 
-  if (isChatInfoLoading || isChatMessagesLoading) {
+  if (isChatInfoLoading) {
     return (
       <ResizablePanel
         defaultSize={70}
@@ -204,14 +205,12 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
             )}
           </Dialog>
         </div>
-        <RoleGuard
-          allowedRoles={allowedRoles.chatDropdownMenu}
-          userRole={currentUserInChat?.role!}
-        >
-          <div className="ml-auto">
-            <ChatDropdownMenu chatId={currentChatId} />
-          </div>
-        </RoleGuard>
+        <div className="ml-auto">
+          <ChatDropdownMenu
+            chatId={currentChatId}
+            userRole={currentUserInChat?.role!}
+          />
+        </div>
       </div>
 
       {chatMessages?.data?.pinnedMessage && (
@@ -265,26 +264,34 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
       ) : (
         <ScrollArea className="p-4 h-screen">
           <div ref={messagesAreaRef} className="grid gap-4">
-            {chatMessages?.data?.messages.map((message) => (
-              <ChatMessage
-                files={message.files}
-                id={message.id}
-                chatId={currentChatId}
-                key={message.id}
-                message={message.content}
-                isCurrentUserSender={user?.id === message.senderId}
-                avatar={message.senderAvatar}
-                timestamp={new Date(message.createdAt)}
-                senderName={message.senderName}
-                parentMessage={message.parentMessage}
-                setReplyMessage={setReplyMessage}
-                isSystem={message.isSystem}
-                isGroup={chatInfo?.data?.chatInfo.isGroup!}
-                senderId={message.senderId}
-                isPinned={message.isPinned}
-                scrollToMessage={scrollToMessage}
-              />
-            ))}
+            {isChatMessagesLoading ? (
+              <div className="flex flex-col items-center justify-center w-full h-screen">
+                <MessagesSkeleton />
+              </div>
+            ) : (
+              <>
+                {chatMessages?.data?.messages.map((message) => (
+                  <ChatMessage
+                    files={message.files}
+                    id={message.id}
+                    chatId={currentChatId}
+                    key={message.id}
+                    message={message.content}
+                    isCurrentUserSender={user?.id === message.senderId}
+                    avatar={message.senderAvatar}
+                    timestamp={new Date(message.createdAt)}
+                    senderName={message.senderName}
+                    parentMessage={message.parentMessage}
+                    setReplyMessage={setReplyMessage}
+                    isSystem={message.isSystem}
+                    isGroup={chatInfo?.data?.chatInfo.isGroup!}
+                    senderId={message.senderId}
+                    isPinned={message.isPinned}
+                    scrollToMessage={scrollToMessage}
+                  />
+                ))}
+              </>
+            )}
           </div>
         </ScrollArea>
       )}

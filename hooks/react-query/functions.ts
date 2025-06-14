@@ -374,6 +374,25 @@ export const inviteUsersToChat = async (data: {
   }
 };
 
+export const leaveChat = async (
+  chatId: number
+): Promise<
+  DefaultApiResponse<{ message: string; systemMessage: LocalMessage }>
+> => {
+  try {
+    const res = await axios.delete(`${API_BASE_URL}/chats/${chatId}/leave`, {
+      headers: {
+        Authorization: "Bearer " + getCookie(authTokenName),
+      },
+    });
+
+    return { data: res.data };
+  } catch (err) {
+    const error = err as AxiosError;
+    return { error: error.response?.data };
+  }
+};
+
 export const removeUsersFromChat = async (data: {
   users: number[];
   chatId: number;

@@ -10,6 +10,7 @@ import {
   getUserById,
   getUserChats,
   inviteUsersToChat,
+  leaveChat,
   loginUser,
   pinMessage,
   registerUser,
@@ -75,6 +76,24 @@ export const useSearchUsersToCreateChat = () => {
   return useQuery({
     queryKey: ["searchUsersToCreateChat"],
     queryFn: () => searchUsersToCreateChat(),
+  });
+};
+
+export const useLeaveChat = (chatId: number, socket: Socket | null) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["leaveChat"],
+    mutationFn: () => leaveChat(chatId),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries("chats");
+      updateMessagesStatusOnNewMessage(
+        queryClient,
+        chatId,
+        data.data?.systemMessage!
+      );
+      socket?.emit("chat-message", JSON.stringify(data.data?.systemMessage!));
+    },
   });
 };
 

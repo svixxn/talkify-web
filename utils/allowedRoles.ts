@@ -8,7 +8,8 @@ type RestrictedAction =
   | "removeMembers"
   | "changeRole"
   | "chatDropdownMenu"
-  | "chatSettings";
+  | "chatSettings"
+  | "chatActions";
 
 type ChatRoleMap = {
   [key in RestrictedAction]: ChatRole[];
@@ -21,4 +22,5 @@ export const allowedRoles = {
   changeRole: ["admin"],
   chatDropdownMenu: ["admin", "moderator"],
   chatSettings: ["admin", "moderator"],
+  chatActions: ["admin"],
 } as ChatRoleMap;

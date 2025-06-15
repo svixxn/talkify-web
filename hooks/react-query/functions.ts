@@ -377,7 +377,7 @@ export const inviteUsersToChat = async (data: {
 export const leaveChat = async (
   chatId: number
 ): Promise<
-  DefaultApiResponse<{ message: string; systemMessage: LocalMessage }>
+  DefaultApiResponse<{ message: string; systemMessage?: LocalMessage }>
 > => {
   try {
     const res = await axios.delete(`${API_BASE_URL}/chats/${chatId}/leave`, {

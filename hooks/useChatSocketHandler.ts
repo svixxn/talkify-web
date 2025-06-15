@@ -36,6 +36,12 @@ export const useChatSocketHandler = ({
   const { hasJoinedChats, setHasJoinedChats, currentChatId, setCurrentChatId } =
     useChatContext();
 
+  const currentChatIdRef = useRef<number | null>(currentChatId);
+
+  useEffect(() => {
+    currentChatIdRef.current = currentChatId;
+  }, [currentChatId]);
+
   useEffect(() => {
     if (socket && !areEventsInitialized.current) {
       areEventsInitialized.current = true;
@@ -44,7 +50,7 @@ export const useChatSocketHandler = ({
       );
 
       socket.on("delete-chat", (chatId) => {
-        if (chatId === currentChatId) setCurrentChatId(null);
+        if (chatId === currentChatIdRef.current) setCurrentChatId(null);
         handleDeletedChat(queryClient, chatId);
       });
 

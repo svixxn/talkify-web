@@ -47,9 +47,10 @@ import { allowedRoles } from "@/utils/allowedRoles";
 type Props = {
   chatId: number;
   userRole: ChatRole;
+  isPrivateChat: boolean;
 };
 
-const ChatDropdownMenu = ({ chatId, userRole }: Props) => {
+const ChatDropdownMenu = ({ chatId, userRole, isPrivateChat }: Props) => {
   const { toast } = useToast();
   const [actionType, setActionType] = useState<
     "clear" | "delete" | "leave" | undefined
@@ -116,6 +117,8 @@ const ChatDropdownMenu = ({ chatId, userRole }: Props) => {
     toast({
       title: "You have left the chat.",
     });
+
+    if (isPrivateChat) socket?.emit("delete-chat", chatId);
 
     setHasJoinedChats(false);
     setCurrentChatId(null);

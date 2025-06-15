@@ -209,6 +209,7 @@ const MainChatArea = ({ currentChatId, screenSize }: Props) => {
           <ChatDropdownMenu
             chatId={currentChatId}
             userRole={currentUserInChat?.role!}
+            isPrivateChat={!chatInfo?.data?.chatInfo.isGroup}
           />
         </div>
       </div>

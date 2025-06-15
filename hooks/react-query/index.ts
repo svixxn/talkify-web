@@ -87,10 +87,11 @@ export const useLeaveChat = (chatId: number, socket: Socket | null) => {
     mutationFn: () => leaveChat(chatId),
     onSuccess: (data) => {
       queryClient.invalidateQueries("chats");
+      if (!data.data?.systemMessage) return;
       updateMessagesStatusOnNewMessage(
         queryClient,
         chatId,
-        data.data?.systemMessage!
+        data.data?.systemMessage
       );
       socket?.emit("chat-message", JSON.stringify(data.data?.systemMessage!));
     },
